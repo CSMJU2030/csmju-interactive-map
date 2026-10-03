@@ -6,6 +6,8 @@ ENV DATABASE_URL=postgresql://build:build@localhost:5432/build_only
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY backend/package.json backend/package.json
+COPY backend/prisma backend/prisma
+COPY backend/prisma.config.ts backend/prisma.config.ts
 RUN pnpm install --frozen-lockfile --filter @csmju-interactive-map/backend...
 
 COPY backend backend
