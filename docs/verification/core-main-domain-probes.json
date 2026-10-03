@@ -1,0 +1,52 @@
+[
+  {
+    "target": "map through frontend proxy",
+    "path": "/api/v1/places/core-rooms",
+    "status": 503,
+    "code": "SERVICE_UNAVAILABLE"
+  },
+  {
+    "target": "map through frontend proxy",
+    "path": "/api/v1/lecturers/core-people",
+    "status": 503,
+    "code": "SERVICE_UNAVAILABLE"
+  },
+  {
+    "target": "map through frontend proxy",
+    "path": "/api/v1/places?limit=10",
+    "status": 200,
+    "code": null
+  },
+  {
+    "target": "Core Hub main backend",
+    "path": "/api/v1/rooms",
+    "status": 404
+  },
+  {
+    "target": "Core Hub main backend",
+    "path": "/api/v1/people?personType=STAFF",
+    "status": 404
+  },
+  {
+    "target": "live Core Hub without credentials",
+    "path": "/api/v1/health",
+    "status": 200
+  },
+  {
+    "target": "live Core Hub without credentials",
+    "path": "/api/v1/.well-known/jwks.json",
+    "status": 200,
+    "rawJwks": true,
+    "signingKeys": 1
+  },
+  {
+    "target": "live Core Hub without credentials",
+    "path": "/api/v1/rooms",
+    "status": 401
+  },
+  {
+    "target": "live Core Hub without credentials",
+    "path": "/api/v1/people",
+    "status": 401
+  }
+]

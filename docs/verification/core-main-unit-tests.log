@@ -1,0 +1,24 @@
+$ jest "--runInBand"
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM    WARN [SsoService] {"event":"sso.callback_rejected","subsystem":"student-service","sub":"user-002"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM    WARN [SsoService] {"event":"sso.callback_rejected","subsystem":"student-service","sub":"user-002"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM    WARN [SsoService] {"event":"sso.callback_rejected","subsystem":"student-service","sub":"user-002"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM    WARN [SsoService] {"event":"sso.callback_rejected","subsystem":"student-service","sub":"user-002"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM    WARN [SsoService] {"event":"sso.callback_rejected","subsystem":"student-service","sub":"user-002"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM    WARN [SsoService] {"event":"sso.role_not_allowed","subsystem":"student-service","sub":"user-002","coreRole":"alumni","allowedCoreRoles":["admin","staff","student"]}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM    WARN [SsoService] {"event":"sso.role_not_allowed","subsystem":"student-service","sub":"user-002","coreRole":"student","allowedCoreRoles":["staff"]}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+[Nest] 2224  - 10/03/2026, 10:00:01 PM     LOG [SsoService] {"event":"sso.handoff_issued","subsystem":"student-service","sub":"user-002","sid":"session-123","callbackUrl":"http://localhost:3001/auth/callback"}
+
+Test Suites: 3 passed, 3 total
+Tests:       35 passed, 35 total
+Snapshots:   0 total
+Time:        13.692 s
+Ran all test suites.

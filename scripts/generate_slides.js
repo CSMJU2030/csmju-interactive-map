@@ -1,0 +1,870 @@
+const fs = require('fs');
+const path = require('path');
+const { execFileSync } = require('child_process');
+
+const edgePath = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
+if (!fs.existsSync(edgePath)) {
+  console.error('Edge executable not found at:', edgePath);
+  process.exit(1);
+}
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSMJU Interactive Map - Project Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: 1920px 1080px;
+    margin: 0;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    width: 1920px;
+    background: #090d16;
+    color: #f1f5f9;
+    font-family: 'Prompt', 'Leelawadee UI', 'Segoe UI', Tahoma, sans-serif;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .slide {
+    width: 1920px;
+    height: 1080px;
+    page-break-after: always;
+    break-after: page;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    position: relative;
+    padding: 70px 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    background: radial-gradient(circle at 10% 20%, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 70%, #090d16 100%);
+  }
+
+  /* Decorative Background Elements */
+  .bg-glow-1 {
+    position: absolute;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    filter: blur(140px);
+    pointer-events: none;
+    opacity: 0.15;
+    z-index: 0;
+  }
+  .bg-glow-emerald {
+    background: #10b981;
+    top: -200px;
+    right: -100px;
+  }
+  .bg-glow-blue {
+    background: #3b82f6;
+    bottom: -200px;
+    left: -100px;
+  }
+  .bg-glow-purple {
+    background: #8b5cf6;
+    top: 30%;
+    right: 20%;
+  }
+
+  .content-layer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+  }
+
+  /* Header */
+  .slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 24px;
+  }
+  .badge-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .badge-tag.blue {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+  }
+  .badge-tag.amber {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+  }
+  .slide-category {
+    font-size: 20px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Chakra Petch', sans-serif;
+  }
+  .slide-number {
+    font-family: 'Chakra Petch', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  /* Main Body */
+  .slide-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
+  }
+  .title-main {
+    font-size: 58px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #ffffff;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .title-main span.highlight {
+    background: linear-gradient(135deg, #34d399 0%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .title-desc {
+    font-size: 26px;
+    color: #94a3b8;
+    font-weight: 400;
+    line-height: 1.5;
+    max-width: 1400px;
+    margin-bottom: 30px;
+  }
+
+  /* Footer */
+  .slide-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 20px;
+    color: #64748b;
+    font-size: 16px;
+  }
+  .footer-subsystem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .dot-online {
+    width: 10px;
+    height: 10px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #10b981;
+  }
+
+  /* Cards & Grid Layouts */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    width: 100%;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 30px;
+    width: 100%;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    width: 100%;
+  }
+  .card {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 34px 36px;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .card.featured {
+    border-color: rgba(52, 211, 153, 0.4);
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(16, 185, 129, 0.08) 100%);
+  }
+  .card.highlight-blue {
+    border-color: rgba(56, 189, 248, 0.3);
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(56, 189, 248, 0.06) 100%);
+  }
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .card-title {
+    font-size: 26px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 14px;
+  }
+  .card-text {
+    font-size: 20px;
+    color: #cbd5e1;
+    line-height: 1.6;
+  }
+  .card-list {
+    list-style: none;
+    margin-top: 10px;
+  }
+  .card-list li {
+    font-size: 19px;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .card-list li::before {
+    content: "•";
+    color: #34d399;
+    font-size: 24px;
+    line-height: 1;
+  }
+  .card-list.blue li::before {
+    color: #38bdf8;
+  }
+  .card-list.amber li::before {
+    color: #fbbf24;
+  }
+
+  /* Metric Pill / Badge Box */
+  .metric-box {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .metric-val {
+    font-family: 'Chakra Petch', sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: #34d399;
+  }
+  .metric-label {
+    font-size: 16px;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+
+  /* Flow Diagram */
+  .flow-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px 40px;
+    margin-top: 24px;
+  }
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px 24px;
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    min-width: 210px;
+  }
+  .flow-node.active {
+    border-color: #34d399;
+    box-shadow: 0 0 25px rgba(52, 211, 153, 0.15);
+  }
+  .flow-arrow {
+    font-size: 28px;
+    color: #64748b;
+    font-weight: bold;
+  }
+  .flow-arrow span {
+    display: block;
+    font-size: 13px;
+    color: #94a3b8;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 4px;
+  }
+
+  /* Step Timeline */
+  .timeline {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+  }
+  .timeline-step {
+    flex: 1;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 28px;
+    position: relative;
+  }
+  .timeline-step.done {
+    border-color: rgba(52, 211, 153, 0.5);
+    background: rgba(16, 185, 129, 0.05);
+  }
+  .timeline-step.current {
+    border-color: rgba(56, 189, 248, 0.7);
+    background: rgba(56, 189, 248, 0.07);
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.12);
+  }
+  .timeline-step.pending {
+    opacity: 0.65;
+  }
+  .step-status {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .step-status.done {
+    background: #065f46;
+    color: #6ee7b7;
+  }
+  .step-status.current {
+    background: #075985;
+    color: #7dd3fc;
+  }
+  .step-status.pending {
+    background: #334155;
+    color: #94a3b8;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ==================== SLIDE 1 ==================== -->
+  <div class="slide">
+    <div class="bg-glow-1 bg-glow-emerald"></div>
+    <div class="bg-glow-1 bg-glow-blue"></div>
+
+    <div class="content-layer">
+      <div class="slide-header">
+        <div class="badge-tag">
+          <span class="dot-online"></span>
+          CSMJU2030 Unified Ecosystem
+        </div>
+        <div class="slide-category">Subsystem Progress Report</div>
+        <div class="slide-number">01 / 06</div>
+      </div>
+
+      <div class="slide-body" style="padding: 20px 0;">
+        <div style="margin-bottom: 24px;">
+          <span style="font-family: 'Chakra Petch', sans-serif; font-size: 22px; color: #34d399; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;">
+            Interactive Map Subsystem
+          </span>
+        </div>
+        <h1 class="title-main" style="font-size: 68px; line-height: 1.15; margin-bottom: 20px;">
+          ระบบแผนที่สาขาแบบ <span class="highlight">Interactive</span><br>
+          ค้นหาห้องและห้องพักอาจารย์
+        </h1>
+        <p class="title-desc" style="font-size: 26px; max-width: 1200px;">
+          Plug-in Subsystem สำหรับแสดงแผนผังอาคารแบบโต้ตอบ ค้นหาห้องเรียน ห้องแล็บ และห้องพักอาจารย์ได้ทันที เชื่อมต่อระบบกลางด้วย Two-Tier RBAC และ Gateway Authentication
+        </p>
+
+        <!-- Presenter Card -->
+        <div style="display: flex; gap: 30px; margin-top: 20px;">
+          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px 28px; display: flex; align-items: center; gap: 20px;">
+            <div style="font-size: 38px;">👨‍💻</div>
+            <div>
+              <div style="font-size: 15px; color: #94a3b8;">ผู้พัฒนาโครงการ (Owner)</div>
+              <div style="font-size: 22px; font-weight: 600; color: #ffffff;">นายภัทรชาติ (รหัสนักศึกษา 6704101358)</div>
+            </div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px 28px; display: flex; align-items: center; gap: 20px;">
+            <div style="font-size: 38px;">🏛️</div>
+            <div>
+              <div style="font-size: 15px; color: #94a3b8;">สังกัดโครงการ</div>
+              <div style="font-size: 22px; font-weight: 600; color: #ffffff;">สาขาวิทยาการคอมพิวเตอร์ คณะวิทยาศาสตร์ มหาวิทยาลัยแม่โจ้</div>
+            </div>
+          </div>
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(52, 211, 153, 0.3); border-radius: 16px; padding: 20px 28px; display: flex; align-items: center; gap: 20px;">
+            <div style="font-size: 38px;">⚡</div>
+            <div>
+              <div style="font-size: 15px; color: #34d399;">สถานะปัจจุบัน (Status)</div>
+              <div style="font-size: 22px; font-weight: 600; color: #34d399;">Core Ready (พร้อมเข้าสู่ Integration)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-subsystem">
+          <span class="dot-online"></span>
+          <span>CSMJU2030 Subsystem: <strong>csmju-interactive-map</strong></span>
+        </div>
+        <div>Computer Science Maejo University © 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 2 ==================== -->
+  <div class="slide">
+    <div class="bg-glow-1 bg-glow-blue"></div>
+
+    <div class="content-layer">
+      <div class="slide-header">
+        <div class="badge-tag blue">
+          🎯 Motivation & Problem Statement
+        </div>
+        <div class="slide-category">ที่มา ปัญหา และเป้าหมาย</div>
+        <div class="slide-number">02 / 06</div>
+      </div>
+
+      <div class="slide-body">
+        <h2 class="title-main" style="font-size: 46px;">
+          ทำไมถึงต้องมี <span class="highlight">CSMJU Interactive Map?</span>
+        </h2>
+        <p class="title-desc">
+          เปลี่ยนปัญหาแผนผังกระดาษเดิมๆ ให้เป็นระบบนำทางและสืบค้นอัจฉริยะของสาขา
+        </p>
+
+        <div class="grid-2">
+          <!-- Problem Box -->
+          <div class="card" style="border-color: rgba(239, 68, 68, 0.3); background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(239, 68, 68, 0.05) 100%);">
+            <div class="card-icon" style="color: #f87171; border-color: rgba(239, 68, 68, 0.3);">⚠️</div>
+            <h3 class="card-title" style="color: #fca5a5;">ปัญหาเดิมของสาขา (Pain Points)</h3>
+            <ul class="card-list" style="margin-top: 14px;">
+              <li><strong>ผังอาคารเป็นรูปภาพนิ่ง (Static Image):</strong> ไม่สามารถค้นหาชื่อห้อง รหัส หรืออาจารย์ได้</li>
+              <li><strong>นักศึกษาใหม่และบุคคลภายนอกหลงทาง:</strong> ไม่ทราบว่าห้องปฏิบัติการหรือห้องพักอาจารย์อยู่ที่ชั้นไหน</li>
+              <li><strong>ข้อมูลไม่เป็นปัจจุบัน:</strong> เมื่อมีการย้ายห้องพักหรือเปลี่ยนอาจารย์ประจำห้อง ข้อมูลในป้ายประกาศไม่อัปเดต</li>
+              <li><strong>ขาดการเชื่อมต่อกับระบบกลาง:</strong> ระบบเดิมทำงานแยกเดี่ยว ข้อมูลไม่ลิงก์กับ Ecosystem ของสาขา</li>
+            </ul>
+          </div>
+
+          <!-- Solution Box -->
+          <div class="card featured">
+            <div class="card-icon" style="color: #34d399; border-color: rgba(52, 211, 153, 0.3);">💡</div>
+            <h3 class="card-title" style="color: #6ee7b7;">เป้าหมายและสิ่งที่ระบบตอบโจทย์ (Solutions)</h3>
+            <ul class="card-list" style="margin-top: 14px;">
+              <li><strong>Interactive SVG Floor Plan:</strong> แผนผังแบบ Vector ตอบสนองการคลิก Hover และไฮไลท์ตำแหน่งชัดเจน</li>
+              <li><strong>ค้นหาแม่นยำ (Instant Search):</strong> เสิร์ชหาจากชื่อห้อง, รหัสห้อง, หมวดหมู่ หรือแม้แต่ชื่ออาจารย์ได้ทันที</li>
+              <li><strong>Room Details & QR Code:</strong> แสดงรูปภาพ รายการอุปกรณ์ในห้อง พร้อม QR Code ให้สแกนเปิดบนมือถือ</li>
+              <li><strong>Plug-in Architecture:</strong> เสียบเข้ากับ CSMJU2030 ได้ทันทีโดยไม่ต้องสร้างระบบ Login ซ้ำซ้อน</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-subsystem">
+          <span>ความต้องการ: อำนวยความสะดวกในการค้นหาสถานที่แก่นักศึกษาและอาจารย์</span>
+        </div>
+        <div>02 / 06</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 3 ==================== -->
+  <div class="slide">
+    <div class="bg-glow-1 bg-glow-purple"></div>
+
+    <div class="content-layer">
+      <div class="slide-header">
+        <div class="badge-tag blue">
+          🛠️ Architecture & Technologies
+        </div>
+        <div class="slide-category">สถาปัตยกรรมและเทคโนโลยี</div>
+        <div class="slide-number">03 / 06</div>
+      </div>
+
+      <div class="slide-body">
+        <h2 class="title-main" style="font-size: 46px;">
+          สถาปัตยกรรมระบบ <span class="highlight">Tech Stack & Integration</span>
+        </h2>
+        <p class="title-desc">
+          โครงสร้างแบบ Decoupled แยก Frontend, Backend และต่อเชื่อมระบบกลางผ่าน API Gateway
+        </p>
+
+        <div class="grid-3" style="margin-bottom: 20px;">
+          <div class="card">
+            <div class="card-icon">💻</div>
+            <h3 class="card-title">Frontend Stack</h3>
+            <ul class="card-list blue">
+              <li><strong>Next.js (App Router):</strong> Server & Client Components ความเร็วสูง</li>
+              <li><strong>TypeScript & Tailwind CSS:</strong> Strict Type ปลอดภัย ดีไซน์ทันสมัย</li>
+              <li><strong>Interactive SVG Engine:</strong> ควบคุมสถานะห้อง, พิกัด, สี และ Layer</li>
+              <li><strong>QR Code Generator:</strong> สร้าง Dynamic URL ให้ผู้ใช้เปิดบนมือถือ</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">⚙️</div>
+            <h3 class="card-title">Backend Stack</h3>
+            <ul class="card-list">
+              <li><strong>NestJS Framework:</strong> สถาปัตยกรรม Modular ดูแลง่ายในระยะยาว</li>
+              <li><strong>PostgreSQL & Prisma ORM:</strong> ฐานข้อมูลเสถียรสูง พร้อม Type-safe Schema</li>
+              <li><strong>RESTful API v1:</strong> OpenAPI / Swagger Document อัตโนมัติ</li>
+              <li><strong>Class Validator & DTO:</strong> ตรวจสอบความถูกต้องของ Input ทุกระดับ</li>
+            </ul>
+          </div>
+
+          <div class="card highlight-blue">
+            <div class="card-icon">🛡️</div>
+            <h3 class="card-title">Security & RBAC</h3>
+            <ul class="card-list blue">
+              <li><strong>Gateway-Header Auth:</strong> รับข้อมูลตัวตนจาก CSMJU Gateway ปลอดภัย</li>
+              <li><strong>Zero Password Storage:</strong> ไร้ความเสี่ยง ไม่เก็บรหัสผ่านซ้ำซ้อน</li>
+              <li><strong>Two-Tier RBAC:</strong>
+                <div style="font-size: 16px; margin-top: 6px; color: #94a3b8;">
+                  • <code>Guest</code>: ดู/ค้นหาแผนที่ (Student, Alumni)<br>
+                  • <code>Editor</code>: เพิ่ม/แก้ไขข้อมูล (Staff, อาจารย์)<br>
+                  • <code>Admin</code>: จัดการสิทธิ์ ลบข้อมูล และควบคุมระบบ
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Architecture Flow -->
+        <div class="flow-container">
+          <div class="flow-node">
+            <div style="font-size: 26px;">🌐</div>
+            <div style="font-weight: 600; font-size: 18px; margin-top: 6px;">Client Browser</div>
+            <div style="font-size: 13px; color: #94a3b8;">Next.js Frontend (:3002)</div>
+          </div>
+          <div class="flow-arrow">
+            ➜
+            <span>REST / JSON</span>
+          </div>
+          <div class="flow-node active">
+            <div style="font-size: 26px;">🛡️</div>
+            <div style="font-weight: 600; font-size: 18px; margin-top: 6px; color: #34d399;">API Gateway (Core)</div>
+            <div style="font-size: 13px; color: #94a3b8;">Trusted Identity Headers</div>
+          </div>
+          <div class="flow-arrow">
+            ➜
+            <span>Injected Headers</span>
+          </div>
+          <div class="flow-node">
+            <div style="font-size: 26px;">⚡</div>
+            <div style="font-weight: 600; font-size: 18px; margin-top: 6px;">NestJS Backend (:4000)</div>
+            <div style="font-size: 13px; color: #94a3b8;">RBAC & Domain Services</div>
+          </div>
+          <div class="flow-arrow">
+            ➜
+            <span>Prisma ORM</span>
+          </div>
+          <div class="flow-node">
+            <div style="font-size: 26px;">🗄️</div>
+            <div style="font-weight: 600; font-size: 18px; margin-top: 6px;">PostgreSQL DB</div>
+            <div style="font-size: 13px; color: #94a3b8;">Places, Lecturers, Roles</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-subsystem">
+          <span>Architecture: Follows CSMJU2030 Official Standards v1.2.0</span>
+        </div>
+        <div>03 / 06</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 4 ==================== -->
+  <div class="slide">
+    <div class="bg-glow-1 bg-glow-emerald"></div>
+
+    <div class="content-layer">
+      <div class="slide-header">
+        <div class="badge-tag">
+          ✅ Progress Milestone
+        </div>
+        <div class="slide-category">ความคืบหน้าปัจจุบัน</div>
+        <div class="slide-number">04 / 06</div>
+      </div>
+
+      <div class="slide-body">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+          <div>
+            <h2 class="title-main" style="font-size: 46px; margin-bottom: 10px;">
+              ฟังก์ชันที่พัฒนา <span class="highlight">เสร็จสมบูรณ์แล้ว</span>
+            </h2>
+            <p class="title-desc" style="margin-bottom: 0;">
+              ระบบ Core ทั้งหน้าบ้าน หลังบ้าน และระบบทดสอบพร้อมใช้งาน 100%
+            </p>
+          </div>
+          <div style="display: flex; gap: 16px;">
+            <div class="metric-box">
+              <div class="metric-val">100%</div>
+              <div class="metric-label">Core Features</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-val" style="color: #38bdf8;">16/16</div>
+              <div class="metric-label">Unit Tests Passed</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="card featured">
+            <div class="card-icon" style="color: #34d399;">🗺️</div>
+            <h3 class="card-title">1. Interactive Map (User)</h3>
+            <ul class="card-list">
+              <li><strong>Interactive SVG:</strong> รองรับ Hover แสดง tooltip, Click เปิดรายละเอียด, Focus และ Highlight</li>
+              <li><strong>Partial Search:</strong> ค้นหาอัจฉริยะด้วยชื่อห้อง รหัสห้อง และชื่ออาจารย์</li>
+              <li><strong>Category Filter:</strong> กรองหมวดหมู่ (ห้องเรียน, แล็บคอมพิวเตอร์, ห้องพักอาจารย์, ห้องประชุม)</li>
+              <li><strong>Detail Panel & QR:</strong> สรุปอุปกรณ์, สถานะห้อง, และปุ่มสร้าง QR Code</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="color: #38bdf8;">🛠️</div>
+            <h3 class="card-title">2. Admin System (Management)</h3>
+            <ul class="card-list blue">
+              <li><strong>Place CRUD:</strong> จัดการเพิ่ม แก้ไข ลบสถานที่ พร้อมตรวจสอบข้อมูลซ้ำ</li>
+              <li><strong>Lecturer Manager:</strong> จัดการรายชื่ออาจารย์ เชื่อมโยงกับห้องพักและข้อมูลติดต่อ</li>
+              <li><strong>Map Layout Editor:</strong> เครื่องมือ Drag/Coordinate ในการจัดผังห้องบนแผนที่</li>
+              <li><strong>Status Toggle:</strong> เปิด/ปิดสถานะการใช้งานห้อง (พร้อมใช้งาน / ซ่อมบำรุง)</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="color: #fbbf24;">⚡</div>
+            <h3 class="card-title">3. Backend & Code Quality</h3>
+            <ul class="card-list amber">
+              <li><strong>Full REST API:</strong> Endpoints ครบครันสำหรับ Places, Lecturers, Search, Health</li>
+              <li><strong>Standard Envelope:</strong> รูปแบบ Response มาตรฐาน พร้อม Meta Pagination</li>
+              <li><strong>Swagger UI:</strong> มี Documentation พร้อมให้ทีมอื่นเชื่อมต่อที่ <code>/docs</code></li>
+              <li><strong>Automated Tests:</strong> Jest + Vitest ทดสอบ Guards, Services และ Controllers ผ่าน 100%</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-subsystem">
+          <span class="dot-online"></span>
+          <span>Automated Testing: All 5 test suites & 16 unit tests passed</span>
+        </div>
+        <div>04 / 06</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 5 ==================== -->
+  <div class="slide">
+    <div class="bg-glow-1 bg-glow-blue"></div>
+    <div class="bg-glow-1 bg-glow-emerald"></div>
+
+    <div class="content-layer">
+      <div class="slide-header">
+        <div class="badge-tag amber">
+          📍 Roadmap & Next Steps
+        </div>
+        <div class="slide-category">ขั้นตอนปัจจุบันและก้าวต่อไป</div>
+        <div class="slide-number">05 / 06</div>
+      </div>
+
+      <div class="slide-body">
+        <h2 class="title-main" style="font-size: 46px;">
+          สถานะปัจจุบัน & <span class="highlight">แผนการดำเนินงานถัดไป</span>
+        </h2>
+        <p class="title-desc">
+          ความพร้อมของระบบและสิ่งที่จะดำเนินการต่อเพื่อนำไปสู่การใช้งานจริงในสาขา
+        </p>
+
+        <!-- Current Status Banner -->
+        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 18px; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px;">
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="font-size: 40px;">🟢</div>
+            <div>
+              <div style="font-size: 22px; font-weight: 700; color: #34d399;">สถานะปัจจุบัน (Current Stage): LOCAL CORE READY</div>
+              <div style="font-size: 18px; color: #cbd5e1; margin-top: 4px;">
+                ระบบ Core ทั้งหมดพัฒนาเสร็จสิ้น ทดสอบฟังก์ชันครบถ้วน พร้อมเข้าสู่กระบวนการนำเข้าข้อมูลจริงและเชื่อมต่อระบบกลาง
+              </div>
+            </div>
+          </div>
+          <div class="badge-tag" style="font-size: 18px; padding: 8px 20px;">
+            Ready for Integration
+          </div>
+        </div>
+
+        <!-- Timeline 3 Steps -->
+        <div class="timeline">
+          <div class="timeline-step current">
+            <span class="step-status current">Step 1: กำลังดำเนินการ</span>
+            <h3 style="font-size: 24px; color: #ffffff; margin-bottom: 12px;">1. Real Floor Plan & Data</h3>
+            <p style="font-size: 18px; color: #cbd5e1; line-height: 1.6;">
+              • นำผังอาคารจริงของตึกสาขาวิทยาการคอมพิวเตอร์มาใส่แทน Sample Data<br>
+              • บันทึกข้อมูลห้องเรียน ห้องแล็บ และรายชื่ออาจารย์ประจำสาขาตามจริง
+            </p>
+          </div>
+
+          <div class="timeline-step pending">
+            <span class="step-status pending">Step 2: ลำดับถัดไป</span>
+            <h3 style="font-size: 24px; color: #ffffff; margin-bottom: 12px;">2. API Gateway Integration</h3>
+            <p style="font-size: 18px; color: #cbd5e1; line-height: 1.6;">
+              • เชื่อมต่อกับ API Gateway ส่วนกลางของโครงการ CSMJU2030<br>
+              • ทดสอบการรับ Trusted Identity Headers และการแปลงสิทธิ์บทบาทจริง
+            </p>
+          </div>
+
+          <div class="timeline-step pending">
+            <span class="step-status pending">Step 3: ปลายทาง</span>
+            <h3 style="font-size: 24px; color: #ffffff; margin-bottom: 12px;">3. Staging & Production UAT</h3>
+            <p style="font-size: 18px; color: #cbd5e1; line-height: 1.6;">
+              • Deploy ระบบขึ้น Staging Server ของสาขา<br>
+              • ทดสอบการใช้งานจริง (User Acceptance Testing) กับนักศึกษาและอาจารย์
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-subsystem">
+          <span>Milestone: Phase 1 (Core Subsystem) Completed ➜ Entering Phase 2 (Integration & Data)</span>
+        </div>
+        <div>05 / 06</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 6 ==================== -->
+  <div class="slide">
+    <div class="bg-glow-1 bg-glow-purple"></div>
+    <div class="bg-glow-1 bg-glow-emerald"></div>
+
+    <div class="content-layer">
+      <div class="slide-header">
+        <div class="badge-tag">
+          🎉 Summary & Demonstration
+        </div>
+        <div class="slide-category">สรุปและการสาธิต</div>
+        <div class="slide-number">06 / 06</div>
+      </div>
+
+      <div class="slide-body" style="text-align: center; align-items: center;">
+        <div class="badge-tag" style="margin-bottom: 24px; font-size: 18px; padding: 8px 24px;">
+          🚀 Ready for Live Demonstration
+        </div>
+        <h2 class="title-main" style="font-size: 60px; margin-bottom: 20px;">
+          สรุปภาพรวม & <span class="highlight">ถาม-ตอบ (Q&A)</span>
+        </h2>
+        <p class="title-desc" style="text-align: center; max-width: 1000px; font-size: 24px;">
+          ระบบ <strong>CSMJU Interactive Map</strong> พัฒนาได้ตรงตามมาตรฐานโครงการ โค้ดมีคุณภาพสูง มีระบบทดสอบรองรับ และพร้อมต่อยอดสู่การใช้งานจริงในสาขา
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 30px; margin: 30px 0; width: 100%; max-width: 1100px;">
+          <div class="card" style="flex: 1; text-align: left; padding: 26px 30px;">
+            <div style="font-size: 20px; font-weight: 600; color: #34d399; margin-bottom: 8px;">🔗 Local Demo Link</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 18px; color: #f1f5f9;">
+              Frontend: http://localhost:3002/map<br>
+              Swagger Docs: http://localhost:4000/docs
+            </div>
+          </div>
+
+          <div class="card" style="flex: 1; text-align: left; padding: 26px 30px;">
+            <div style="font-size: 20px; font-weight: 600; color: #38bdf8; margin-bottom: 8px;">📊 สรุปความพร้อม</div>
+            <div style="font-size: 18px; color: #cbd5e1;">
+              • Core System: 100% Complete<br>
+              • Unit Tests: 100% Passed (16 Tests)
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <h3 style="font-size: 32px; font-weight: 600; color: #ffffff;">
+            ขอขอบพระคุณอาจารย์ครับ
+          </h3>
+          <p style="font-size: 20px; color: #94a3b8; margin-top: 6px;">
+            ยินดีรับฟังข้อเสนอแนะและพร้อมตอบทุกข้อซักถามครับ
+          </p>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-subsystem">
+          <span class="dot-online"></span>
+          <span>CSMJU Interactive Map • นายภัทรชาติ (6704101358)</span>
+        </div>
+        <div>06 / 06</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
+`;
+
+const htmlFilePath = path.resolve(__dirname, 'slides.html');
+const pdfOutputPath = path.resolve(__dirname, '..', 'CSMJU_Interactive_Map_Presentation.pdf');
+const brainPdfPath = 'C:\\Users\\phatt\\.gemini\\antigravity\\brain\\c8758463-ed6a-428b-9f24-1fa163ac72c9\\CSMJU_Interactive_Map_Presentation.pdf';
+
+fs.writeFileSync(htmlFilePath, htmlContent, 'utf8');
+console.log('HTML slide written to:', htmlFilePath);
+
+console.log('Generating PDF via Microsoft Edge Headless...');
+try {
+  execFileSync(edgePath, [
+    '--headless=new',
+    '--disable-gpu',
+    '--no-pdf-header-footer',
+    '--print-to-pdf=' + pdfOutputPath,
+    'file:///' + htmlFilePath.replace(/\\/g, '/')
+  ]);
+
+  if (fs.existsSync(pdfOutputPath)) {
+    const stats = fs.statSync(pdfOutputPath);
+    console.log(`Success! PDF generated at: ${pdfOutputPath} (${stats.size} bytes)`);
+    // Also copy to brain folder
+    fs.copyFileSync(pdfOutputPath, brainPdfPath);
+    console.log(`Copied to brain artifact directory: ${brainPdfPath}`);
+  } else {
+    console.error('PDF file was not created.');
+    process.exit(1);
+  }
+} catch (err) {
+  console.error('Error generating PDF:', err.message);
+  process.exit(1);
+}

@@ -1,0 +1,191 @@
+==================================================================
+ CSMJU2030 Subsystem Compliance — local run
+ target: /mnt/c/Users/phatt/OneDrive/Documents/ChatGPT/CSMJU2030
+==================================================================
+
+--- [Convention Check] check-branch-name.sh ---
+✅ [GH-01] Branch name ผ่าน: feature/interactive-map/compliance-fixes
+
+--- [Convention Check] check-commit-messages.sh ---
+✅ [GH-02] ข้ามการตรวจ (ไม่มี base ref ให้เทียบ: HEAD~1)
+
+--- [Convention Check] check-ci-untouched.sh ---
+✅ [GH-03] ข้ามการตรวจ (ไม่มี base ref ให้เทียบ: origin/main)
+
+--- [Standards Version Check] check-submodule-pointer.sh ---
+✅ [GH-04] standards version ตรงกัน: 1.7.1 (ไม่มี submodule standards ให้ตรวจ)
+
+--- [Security & Stack Scan] check-no-secrets.sh ---
+✅ [SEC-01/02] ไม่พบ secret หรือ .env ที่มีค่าจริง
+
+--- [Security & Stack Scan] check-no-local-storage.sh ---
+✅ [SEC-03] ไม่พบ token ใน localStorage
+
+--- [Security & Stack Scan] check-no-jwt-verify.sh ---
+✅ [SEC-04/05] การตรวจ JWT เป็นไปตามสัญญา และไม่มีหน้า login ในระบบย่อย
+
+--- [Security & Stack Scan] check-db-isolation.sh ---
+✅ [ARC-01] Database isolation ผ่าน
+
+--- [Security & Stack Scan] check-authorized-deps.sh ---
+✅ [ARC-02/03] Dependency ทั้งหมดอยู่ใน whitelist
+
+--- [Security & Stack Scan] check-backend-nestjs.sh ---
+✅ [ARC-04] มี backend NestJS ใน backend/
+
+--- [API Contract Sync] check-openapi-sync.sh ---
+$ ts-node --files src/openapi.ts
+✅ [API-01] openapi.json sync กับโค้ด
+
+--- [API Contract Sync] check-api-conventions.sh ---
+✅ [API-02..07] ผ่านการตรวจ API conventions
+
+--- [Data Dictionary Compliance] check-field-aliases.sh ---
+✅ [DD-01/02] ไม่พบ alias ต้องห้าม และ core role อยู่ใน enum
+
+--- [Data Dictionary Compliance] check-snake-case.sh ---
+✅ [DD-03] ชื่อตาราง/คอลัมน์ในฐานข้อมูลเป็น snake_case ครบ
+
+--- [Data Dictionary Compliance] check-no-hardcoded-faculty.sh ---
+✅ [DD-04] ไม่พบรายชื่อคณะแบบ hardcode
+
+--- [Data Dictionary Compliance] check-money-fields.sh ---
+✅ [DD-05] ไม่พบฟิลด์เงินที่เป็น float
+
+--- [UI Token Compliance] check-ui-tokens.sh ---
+✅ [UI-01] ไม่พบ hex color ดิบ (UI-02..04 เป็น warn เท่านั้น)
+
+--- [Code Quality] check-qa.sh ---
+Scope: 2 of 3 workspace projects
+backend lint$ eslint "{src,prisma,test}/**/*.ts"
+frontend lint$ eslint "src/**/*.{js,ts,jsx,tsx}"
+backend lint: Done
+frontend lint: Done
+Scope: 2 of 3 workspace projects
+backend typecheck$ tsc --noEmit
+frontend typecheck$ next typegen && tsc --noEmit
+frontend typecheck: Generating route types...
+frontend typecheck: ✓ Route types generated successfully
+backend typecheck: Done
+frontend typecheck: Done
+Scope: 2 of 3 workspace projects
+backend test$ jest --runInBand
+frontend test$ vitest run
+frontend test:  RUN  v3.2.7 C:/Users/phatt/OneDrive/Documents/ChatGPT/CSMJU2030/frontend
+frontend test:  ✓ src/lib/categories.spec.ts (1 test) 2ms
+frontend test:  Test Files  1 passed (1)
+frontend test:       Tests  1 passed (1)
+frontend test:    Start at  21:43:55
+frontend test:    Duration  1.36s (transform 77ms, setup 0ms, collect 70ms, tests 2ms, environment 0ms, prepare 198ms)
+frontend test: Done
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.019Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.022Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.061Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.063Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.065Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.067Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.108Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"unknown_kid","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.108Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM    WARN [AuthEvents] {"event":"jwks.unknown_kid","kid":"core-hub-1999","knownKids":["core-hub-2026"],"at":"2026-10-03T14:43:59.108Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.110Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.112Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.114Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.115Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.116Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.118Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.119Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.121Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.123Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.124Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.125Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.126Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.127Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"unknown_kid","keyCount":2,"kids":["core-hub-2026","core-hub-2027"],"at":"2026-10-03T14:43:59.129Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.349Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.350Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.351Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"unknown_kid","keyCount":2,"kids":["core-hub-2026","core-hub-2027"],"at":"2026-10-03T14:43:59.351Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.352Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"unknown_kid","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.352Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM    WARN [AuthEvents] {"event":"jwks.unknown_kid","kid":"core-hub-9999","knownKids":["core-hub-2026"],"at":"2026-10-03T14:43:59.352Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.353Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM    WARN [AuthEvents] {"event":"jwks.unknown_kid","kid":"core-hub-9999","knownKids":["core-hub-2026"],"at":"2026-10-03T14:43:59.353Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM    WARN [AuthEvents] {"event":"jwks.unknown_kid","kid":"core-hub-9999","knownKids":["core-hub-2026"],"at":"2026-10-03T14:43:59.353Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.353Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.385Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.386Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM   ERROR [AuthEvents] {"event":"jwks.refresh.failure","reason":"ECONNREFUSED","cachedKeyCount":1,"at":"2026-10-03T14:43:59.417Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM   ERROR [AuthEvents] {"event":"jwks.refresh.failure","reason":"ECONNREFUSED","cachedKeyCount":0,"at":"2026-10-03T14:43:59.419Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM   ERROR [AuthEvents] {"event":"jwks.refresh.failure","reason":"JWKS response contains no usable RS256 signing key","cachedKeyCount":0,"at":"2026-10-03T14:43:59.419Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM   ERROR [AuthEvents] {"event":"jwks.refresh.failure","reason":"Core Hub JWKS must be an RFC 7517 document ({\"keys\":[...]}), but the response was wrapped in an API envelope ({\"data\":{\"keys\":[...]}}). Upgrade the Core Hub to a version that excludes the JWKS endpoint from its response interceptor.","cachedKeyCount":0,"at":"2026-10-03T14:43:59.420Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.421Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:43:59 PM     LOG [AuthEvents] {"event":"jwks.refresh","url":"http://core-hub.test/api/v1/.well-known/jwks.json","reason":"cache_stale_or_empty","keyCount":1,"kids":["core-hub-2026"],"at":"2026-10-03T14:43:59.422Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:44:00 PM    WARN [AuthEvents] {"event":"authorization.denied","sub":"user-001","subsystemRole":"STUDENT","required":["place:update"],"path":"/api/v1/courses","reason":"missing_permission","at":"2026-10-03T14:44:00.461Z"}
+backend test: [Nest] 8916  - 10/03/2026, 9:44:00 PM    WARN [AuthEvents] {"event":"authorization.denied","sub":"user-001","subsystemRole":"ALUMNI","required":["lecturer:create"],"path":"/api/v1/courses","reason":"missing_permission","at":"2026-10-03T14:44:00.470Z"}
+backend test: Test Suites: 18 passed, 18 total
+backend test: Tests:       245 passed, 245 total
+backend test: Snapshots:   0 total
+backend test: Time:        5.928 s, estimated 6 s
+backend test: Ran all test suites.
+backend test: Done
+Scope: 2 of 3 workspace projects
+frontend build$ next build
+backend build$ nest build
+frontend build:    ▲ Next.js 15.5.23
+frontend build:    - Environments: .env.local
+frontend build:    Creating an optimized production build ...
+backend build: Done
+frontend build:  ✓ Compiled successfully in 1989ms
+frontend build:    Linting and checking validity of types ...
+frontend build:    Collecting page data ...
+frontend build:    Generating static pages (0/10) ...
+frontend build:    Generating static pages (2/10)
+frontend build:    Generating static pages (4/10)
+frontend build:    Generating static pages (7/10)
+frontend build:  ✓ Generating static pages (10/10)
+frontend build:    Finalizing page optimization ...
+frontend build:    Collecting build traces ...
+frontend build: Route (app)                                 Size  First Load JS
+frontend build: ┌ ○ /                                      144 B         103 kB
+frontend build: ├ ○ /_not-found                            144 B         103 kB
+frontend build: ├ ○ /about                                 144 B         103 kB
+frontend build: ├ ○ /admin                               26.2 kB         129 kB
+frontend build: ├ ○ /locations                           2.98 kB         109 kB
+frontend build: ├ ○ /map                                 14.9 kB         121 kB
+frontend build: ├ ○ /personnel                           9.24 kB         112 kB
+frontend build: └ ○ /signin-again                          922 B         103 kB
+frontend build: + First Load JS shared by all             102 kB
+frontend build:   ├ chunks/1-29c74b20b3c6c6c2.js         46.2 kB
+frontend build:   ├ chunks/f0e3d1c0-61dfc2149720d145.js  54.2 kB
+frontend build:   └ other shared chunks (total)          1.99 kB
+frontend build: ○  (Static)  prerendered as static content
+frontend build: Done
+✅ [QA-05/06] ผ่านการตรวจ package manager และ workspace filter
+
+--- [Exception Validation] check-exceptions.sh ---
+✅ [EXC-01] ไม่พบ .compliance-exceptions.yml (ไม่มี exception ใช้งานอยู่)
+
+==================================================================
+ Summary
+==================================================================
+  ✅ PASS  Convention Check            check-branch-name.sh
+  ✅ PASS  Convention Check            check-commit-messages.sh
+  ✅ PASS  Convention Check            check-ci-untouched.sh
+  ✅ PASS  Standards Version Check     check-submodule-pointer.sh
+  ✅ PASS  Security & Stack Scan       check-no-secrets.sh
+  ✅ PASS  Security & Stack Scan       check-no-local-storage.sh
+  ✅ PASS  Security & Stack Scan       check-no-jwt-verify.sh
+  ✅ PASS  Security & Stack Scan       check-db-isolation.sh
+  ✅ PASS  Security & Stack Scan       check-authorized-deps.sh
+  ✅ PASS  Security & Stack Scan       check-backend-nestjs.sh
+  ✅ PASS  API Contract Sync           check-openapi-sync.sh
+  ✅ PASS  API Contract Sync           check-api-conventions.sh
+  ✅ PASS  Data Dictionary Compliance  check-field-aliases.sh
+  ✅ PASS  Data Dictionary Compliance  check-snake-case.sh
+  ✅ PASS  Data Dictionary Compliance  check-no-hardcoded-faculty.sh
+  ✅ PASS  Data Dictionary Compliance  check-money-fields.sh
+  ✅ PASS  UI Token Compliance         check-ui-tokens.sh
+  ✅ PASS  Code Quality                check-qa.sh
+  ✅ PASS  Exception Validation        check-exceptions.sh
+
+✅ All 19 checks passed.

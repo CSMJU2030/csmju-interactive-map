@@ -1,0 +1,513 @@
+{
+  "subsystemId": "csmju-interactive-map",
+  "standardsVersion": "1.2",
+  "level": "L3",
+  "summary": {
+    "PASS": 71,
+    "FAIL": 0,
+    "SKIP": 0,
+    "WARN": 0,
+    "retries": 0
+  },
+  "conformant": true,
+  "results": [
+    {
+      "group": "L1 · Identity — health & public surface",
+      "id": "L1-01",
+      "title": "GET /api/health → 200",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — health & public surface",
+      "id": "L1-02",
+      "title": "health uses the success envelope",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — health & public surface",
+      "id": "L1-03",
+      "title": "health reports status \"ok\"",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — health & public surface",
+      "id": "L1-04",
+      "title": "health reports the registered subsystem id",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — health & public surface",
+      "id": "L1-05",
+      "title": "no local login endpoint at POST /api/v1/auth/login",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — health & public surface",
+      "id": "L1-06",
+      "title": "no local login endpoint at POST /api/v1/login",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — health & public surface",
+      "id": "L1-07",
+      "title": "no local login endpoint at POST /api/v1/auth/register",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — /api/v1/me with a real Core Hub token",
+      "id": "L1-08",
+      "title": "GET /api/v1/me → 200",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — /api/v1/me with a real Core Hub token",
+      "id": "L1-09",
+      "title": "/me uses the success envelope",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — /api/v1/me with a real Core Hub token",
+      "id": "L1-10",
+      "title": "/me.id equals the token subject",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — /api/v1/me with a real Core Hub token",
+      "id": "L1-11",
+      "title": "/me.coreRole equals the token role",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — /api/v1/me with a real Core Hub token",
+      "id": "L1-12",
+      "title": "/me.subsystemRole is a mapped, non-empty value",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-13",
+      "title": "no token → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-14",
+      "title": "error envelope on 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-15",
+      "title": "error code is UNAUTHORIZED",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-16",
+      "title": "non-Bearer scheme → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-17",
+      "title": "malformed token → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-18",
+      "title": "expired token → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-19",
+      "title": "wrong issuer → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-20",
+      "title": "wrong audience → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-21",
+      "title": "unknown kid → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-22",
+      "title": "signature from a foreign key → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-23",
+      "title": "missing sub claim → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-24",
+      "title": "alg=none (unsigned) → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-25",
+      "title": "HS256 token → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-26",
+      "title": "tampered role claim → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — every rejected token must answer 401",
+      "id": "L1-27",
+      "title": "tampered sub claim → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — role mapping and error hygiene",
+      "id": "L1-28.admin",
+      "title": "core role \"admin\" is mapped (200) or explicitly refused (403)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — role mapping and error hygiene",
+      "id": "L1-28.student",
+      "title": "core role \"student\" is mapped (200) or explicitly refused (403)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — role mapping and error hygiene",
+      "id": "L1-28.staff",
+      "title": "core role \"staff\" is mapped (200) or explicitly refused (403)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — role mapping and error hygiene",
+      "id": "L1-28.alumni",
+      "title": "core role \"alumni\" is mapped (200) or explicitly refused (403)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — role mapping and error hygiene",
+      "id": "L1-28.lecturer",
+      "title": "core role \"lecturer\" is mapped (200) or explicitly refused (403)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — role mapping and error hygiene",
+      "id": "L1-28.guest",
+      "title": "core role \"guest\" is mapped (200) or explicitly refused (403)",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L1 · Identity — role mapping and error hygiene",
+      "id": "L1-30",
+      "title": "error responses do not leak stack traces or internals",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — collection shape & pagination",
+      "id": "L2-01",
+      "title": "GET /api/v1/places → 200",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — collection shape & pagination",
+      "id": "L2-02",
+      "title": "collection returns data as an array",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — collection shape & pagination",
+      "id": "L2-03",
+      "title": "collection returns meta{total,page,limit,totalPages}",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — collection shape & pagination",
+      "id": "L2-04",
+      "title": "pagination honours ?page=1&limit=1",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — collection shape & pagination",
+      "id": "L2-05",
+      "title": "invalid query parameter → 400",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — collection shape & pagination",
+      "id": "L2-06",
+      "title": "invalid query uses VALIDATION_ERROR",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — 404 / 400 / 403",
+      "id": "L2-07",
+      "title": "unknown resource id → 404",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — 404 / 400 / 403",
+      "id": "L2-08",
+      "title": "404 uses NOT_FOUND",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — 404 / 400 / 403",
+      "id": "L2-09",
+      "title": "malformed resource id → 400",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — 404 / 400 / 403",
+      "id": "L2-10",
+      "title": "invalid request body → 400",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — 404 / 400 / 403",
+      "id": "L2-11",
+      "title": "invalid body uses VALIDATION_ERROR",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — 404 / 400 / 403",
+      "id": "L2-12",
+      "title": "role \"guest\" cannot write → 403",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — 404 / 400 / 403",
+      "id": "L2-13",
+      "title": "denied write uses FORBIDDEN",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — error codes come from the closed enum",
+      "id": "L2-14",
+      "title": "unknown route → 404 with an error envelope",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L2 · Contract — error codes come from the closed enum",
+      "id": "L2-15",
+      "title": "every returned error code is part of the standard enum",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — registration",
+      "id": "L3-01",
+      "title": "subsystem is registered in the Subsystem Registry",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — registration",
+      "id": "L3-02",
+      "title": "registry approvalStatus is APPROVED",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — registration",
+      "id": "L3-03",
+      "title": "registry status is ACTIVE",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — registration",
+      "id": "L3-04",
+      "title": "registered callback_url matches the running subsystem",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — registration",
+      "id": "L3-05",
+      "title": "registry declares the core roles this subsystem accepts",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — /auth/login starts every sign-in",
+      "id": "L3-16",
+      "title": "/auth/login → 302 to Core Hub web /sso/authorize with subsystem and state",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — /auth/login starts every sign-in",
+      "id": "L3-17",
+      "title": "/auth/login sets an HttpOnly csmju_interactive_map_sso_state lasting at most 600 s",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — handoff with the subsystem state",
+      "id": "L3-06",
+      "title": "Core Hub SSO authorize (with state) → 302",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — handoff with the subsystem state",
+      "id": "L3-07",
+      "title": "redirect points at the registered callback and returns the state",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callback establishes a session",
+      "id": "L3-08",
+      "title": "callback with a matching state → 302",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callback establishes a session",
+      "id": "L3-09",
+      "title": "callback sets an HttpOnly csmju_interactive_map_access_token cookie",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callback establishes a session",
+      "id": "L3-10",
+      "title": "the session cookie alone reaches /api/v1/me",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callback establishes a session",
+      "id": "L3-11",
+      "title": "cookie session identifies the same Core Hub user",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callbacks that must not create a session",
+      "id": "L3-12",
+      "title": "callback with a tampered token (state valid) → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callbacks that must not create a session",
+      "id": "L3-13",
+      "title": "no session cookie is issued for a rejected token",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callbacks that must not create a session",
+      "id": "L3-14",
+      "title": "callback without a token → 400 or 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callbacks that must not create a session",
+      "id": "L3-15",
+      "title": "Core Hub rejects an unregistered callback_url",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callbacks that must not create a session",
+      "id": "L3-18",
+      "title": "callback without state → 302 to /auth/login, no session cookie",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callbacks that must not create a session",
+      "id": "L3-19",
+      "title": "callback with a state but no state cookie → 401, no session cookie",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callbacks that must not create a session",
+      "id": "L3-20",
+      "title": "state from one /auth/login with the cookie of another → 401",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — callbacks that must not create a session",
+      "id": "L3-21",
+      "title": "next=//evil.example.com still lands on a path of the subsystem itself",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "group": "L3 · SSO — sign-out",
+      "id": "L3-22",
+      "title": "POST /auth/logout → 303 to Core Hub web /logout and clears csmju_interactive_map_access_token",
+      "status": "PASS",
+      "detail": ""
+    }
+  ],
+  "generatedAt": "2026-10-03T15:02:09.981Z"
+}
