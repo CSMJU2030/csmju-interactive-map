@@ -1,3 +1,4 @@
+import "./openapi-environment";
 import { writeFile } from "node:fs/promises";
 import { ROUTES_OUTSIDE_API_PREFIX } from './app-setup';
 import { NestFactory } from "@nestjs/core";
