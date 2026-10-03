@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PlaceCategory {
+  CLASSROOM
+  COMPUTER_LAB
+  LECTURER_OFFICE
+  DEPARTMENT_OFFICE
+  MEETING_ROOM
+  RESTROOM
+  ENTRANCE
+  FACILITY
+  STUDENT_CLUB
+  STORAGE
+  OTHER
+}
+
+enum SubsystemRole {
+  GUEST
+  EDITOR
+  ADMIN
+}
+
+enum PersonnelType {
+  TEACHER
+  STAFF
+}
+
+model Place {
+  id          String          @id @default(uuid()) @db.Uuid
+  roomCode    String?         @unique @map("room_code")
+  landmarkLabel String?       @map("landmark_label")
+  description String?
+  category    PlaceCategory
+  positionX   Decimal         @map("position_x") @db.Decimal(6, 2)
+  positionY   Decimal         @map("position_y") @db.Decimal(6, 2)
+  width       Decimal?        @db.Decimal(6, 2)
+  height      Decimal?        @db.Decimal(6, 2)
+  isActive    Boolean         @default(true) @map("is_active")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  lecturers   Lecturer[]
+  keywords    SearchKeyword[]
+
+  @@index([category, isActive])
+  @@map("places")
+}
+
+model Lecturer {
+  id                String        @id @default(uuid()) @db.Uuid
+  personCode        String        @unique @map("person_code")
+  coreUserId        String?       @map("core_user_id") @db.VarChar(64)
+  placeId           String?       @map("place_id") @db.Uuid
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  place             Place?        @relation(fields: [placeId], references: [id], onDelete: SetNull)
+
+  @@index([placeId])
+  @@index([coreUserId])
+  @@map("personnel_assignments")
+}
+
+model SearchKeyword {
+  id        String   @id @default(uuid()) @db.Uuid
+  keyword   String
+  placeId   String   @map("place_id") @db.Uuid
+  place     Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([keyword, placeId])
+  @@index([placeId])
+  @@map("search_keywords")
+}
+
+model MapLayout {
+  id             String   @id @default("main") @db.VarChar(32)
+  corridorPoints Json     @map("corridor_points") @db.JsonB
+  corridorWidth  Decimal  @default(4.2) @map("corridor_width") @db.Decimal(4, 2)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("map_layouts")
+}

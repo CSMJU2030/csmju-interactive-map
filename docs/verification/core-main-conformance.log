@@ -1,0 +1,111 @@
+manifest      : C:\Users\phatt\OneDrive\Documents\ChatGPT\CSMJU2030\subsystem.yaml
+CSMJU2030 Subsystem Conformance Runner
+standard      : v1.2
+subsystem     : csmju-interactive-map
+base url      : http://localhost:3292
+core hub      : http://localhost:3092
+level         : L3
+accounts      : C:\Users\phatt\AppData\Local\Temp\csmju-core-integration-private\accounts.json (CONFORMANCE_ACCOUNTS_FILE)
+tokens        : admin, student, staff, alumni, lecturer, guest
+
+── L1 · Identity — health & public surface
+  PASS  L1-01      GET /api/health → 200
+  PASS  L1-02      health uses the success envelope
+  PASS  L1-03      health reports status "ok"
+  PASS  L1-04      health reports the registered subsystem id
+  PASS  L1-05      no local login endpoint at POST /api/v1/auth/login
+  PASS  L1-06      no local login endpoint at POST /api/v1/login
+  PASS  L1-07      no local login endpoint at POST /api/v1/auth/register
+
+── L1 · Identity — /api/v1/me with a real Core Hub token
+  PASS  L1-08      GET /api/v1/me → 200
+  PASS  L1-09      /me uses the success envelope
+  PASS  L1-10      /me.id equals the token subject
+  PASS  L1-11      /me.coreRole equals the token role
+  PASS  L1-12      /me.subsystemRole is a mapped, non-empty value
+
+── L1 · Identity — every rejected token must answer 401
+  PASS  L1-13      no token → 401
+  PASS  L1-14      error envelope on 401
+  PASS  L1-15      error code is UNAUTHORIZED
+  PASS  L1-16      non-Bearer scheme → 401
+  PASS  L1-17      malformed token → 401
+  PASS  L1-18      expired token → 401
+  PASS  L1-19      wrong issuer → 401
+  PASS  L1-20      wrong audience → 401
+  PASS  L1-21      unknown kid → 401
+  PASS  L1-22      signature from a foreign key → 401
+  PASS  L1-23      missing sub claim → 401
+  PASS  L1-24      alg=none (unsigned) → 401
+  PASS  L1-25      HS256 token → 401
+  PASS  L1-26      tampered role claim → 401
+  PASS  L1-27      tampered sub claim → 401
+
+── L1 · Identity — role mapping and error hygiene
+  PASS  L1-28.admin core role "admin" is mapped (200) or explicitly refused (403)
+  PASS  L1-28.student core role "student" is mapped (200) or explicitly refused (403)
+  PASS  L1-28.staff core role "staff" is mapped (200) or explicitly refused (403)
+  PASS  L1-28.alumni core role "alumni" is mapped (200) or explicitly refused (403)
+  PASS  L1-28.lecturer core role "lecturer" is mapped (200) or explicitly refused (403)
+  PASS  L1-28.guest core role "guest" is mapped (200) or explicitly refused (403)
+  PASS  L1-30      error responses do not leak stack traces or internals
+
+── L2 · Contract — collection shape & pagination
+  PASS  L2-01      GET /api/v1/places → 200
+  PASS  L2-02      collection returns data as an array
+  PASS  L2-03      collection returns meta{total,page,limit,totalPages}
+  PASS  L2-04      pagination honours ?page=1&limit=1
+  PASS  L2-05      invalid query parameter → 400
+  PASS  L2-06      invalid query uses VALIDATION_ERROR
+
+── L2 · Contract — 404 / 400 / 403
+  PASS  L2-07      unknown resource id → 404
+  PASS  L2-08      404 uses NOT_FOUND
+  PASS  L2-09      malformed resource id → 400
+  PASS  L2-10      invalid request body → 400
+  PASS  L2-11      invalid body uses VALIDATION_ERROR
+  PASS  L2-12      role "guest" cannot write → 403
+  PASS  L2-13      denied write uses FORBIDDEN
+
+── L2 · Contract — error codes come from the closed enum
+  PASS  L2-14      unknown route → 404 with an error envelope
+  PASS  L2-15      every returned error code is part of the standard enum
+
+── L3 · SSO — registration
+  PASS  L3-01      subsystem is registered in the Subsystem Registry
+  PASS  L3-02      registry approvalStatus is APPROVED
+  PASS  L3-03      registry status is ACTIVE
+  PASS  L3-04      registered callback_url matches the running subsystem
+  PASS  L3-05      registry declares the core roles this subsystem accepts
+
+── L3 · SSO — /auth/login starts every sign-in
+  PASS  L3-16      /auth/login → 302 to Core Hub web /sso/authorize with subsystem and state
+  PASS  L3-17      /auth/login sets an HttpOnly csmju_interactive_map_sso_state lasting at most 600 s
+
+── L3 · SSO — handoff with the subsystem state
+  PASS  L3-06      Core Hub SSO authorize (with state) → 302
+  PASS  L3-07      redirect points at the registered callback and returns the state
+
+── L3 · SSO — callback establishes a session
+  PASS  L3-08      callback with a matching state → 302
+  PASS  L3-09      callback sets an HttpOnly csmju_interactive_map_access_token cookie
+  PASS  L3-10      the session cookie alone reaches /api/v1/me
+  PASS  L3-11      cookie session identifies the same Core Hub user
+
+── L3 · SSO — callbacks that must not create a session
+  PASS  L3-12      callback with a tampered token (state valid) → 401
+  PASS  L3-13      no session cookie is issued for a rejected token
+  PASS  L3-14      callback without a token → 400 or 401
+  PASS  L3-15      Core Hub rejects an unregistered callback_url
+  PASS  L3-18      callback without state → 302 to /auth/login, no session cookie
+  PASS  L3-19      callback with a state but no state cookie → 401, no session cookie
+  PASS  L3-20      state from one /auth/login with the cookie of another → 401
+  PASS  L3-21      next=//evil.example.com still lands on a path of the subsystem itself
+
+── L3 · SSO — sign-out
+  PASS  L3-22      POST /auth/logout → 303 to Core Hub web /logout and clears csmju_interactive_map_access_token
+
+────────────────────────────────────────────────────────────
+RESULT: 71 passed · 0 failed · 0 skipped · 0 warnings · retries: 0
+✅ CONFORMANT — csmju-interactive-map meets standard v1.2 L3
+report        : conformance-report.json

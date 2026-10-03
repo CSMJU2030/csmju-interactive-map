@@ -1,5 +1,31 @@
 {
   "name": "csmju-interactive-map",
+  "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@9.15.9"
+  "packageManager": "pnpm@11.19.0",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install:all": "pnpm install",
+    "dev": "concurrently -n frontend,backend -c blue,green \"pnpm --filter @csmju-interactive-map/frontend dev\" \"pnpm --filter @csmju-interactive-map/backend start:dev\"",
+    "build": "pnpm --filter @csmju-interactive-map/backend build && pnpm --filter @csmju-interactive-map/frontend build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "prisma:generate": "pnpm --filter @csmju-interactive-map/backend prisma:generate",
+    "prisma:migrate": "pnpm --filter @csmju-interactive-map/backend prisma:migrate",
+    "seed": "pnpm --filter @csmju-interactive-map/backend seed",
+    "openapi:export": "pnpm --filter @csmju-interactive-map/backend openapi:export",
+    "generate:openapi": "pnpm --filter @csmju-interactive-map/backend generate:openapi"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": "22.x",
+    "pnpm": ">=10.0.0"
+  }
 }
