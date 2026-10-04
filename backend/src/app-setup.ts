@@ -1,5 +1,11 @@
-import { INestApplication, RequestMethod, ValidationPipe } from '@nestjs/common';
-import type { RouteInfo } from '@nestjs/common/interfaces';
+import {
+  INestApplication,
+  RequestMethod,
+  ValidationPipe,
+  HttpStatus,
+} from "@nestjs/common";
+import { AppException, ErrorCode } from "./common/errors";
+import type { RouteInfo } from "@nestjs/common/interfaces";
 
 /**
  * Routes that stay at the root instead of under the `/api` prefix: the central
@@ -12,9 +18,9 @@ import type { RouteInfo } from '@nestjs/common/interfaces';
  * list, so neither can drift from the other.
  */
 export const ROUTES_OUTSIDE_API_PREFIX: RouteInfo[] = [
-  { path: 'auth/login', method: RequestMethod.GET },
-  { path: 'auth/callback', method: RequestMethod.GET },
-  { path: 'auth/logout', method: RequestMethod.POST },
+  { path: "auth/login", method: RequestMethod.GET },
+  { path: "auth/callback", method: RequestMethod.GET },
+  { path: "auth/logout", method: RequestMethod.POST },
 ];
 
 /**
@@ -29,6 +35,19 @@ export function configureApp(app: INestApplication): void {
       forbidNonWhitelisted: true,
       transform: true,
       transformOptions: { enableImplicitConversion: false },
+      exceptionFactory: (errors) => {
+        const first = errors[0];
+        // API contract v1.7.0 requires 400 for body/query validation, including SSO.
+        return new AppException(
+          ErrorCode.VALIDATION_ERROR,
+          "ข้อมูลในช่องนี้ไม่ถูกต้อง กรุณาตรวจสอบและลองใหม่",
+          HttpStatus.BAD_REQUEST,
+          {
+            field: first?.property ?? "",
+            fields: errors.map((error) => error.property),
+          },
+        );
+      },
     }),
   );
 }

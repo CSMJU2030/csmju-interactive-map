@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { Maximize2, Move } from 'lucide-react';
-import { useRef, type PointerEvent as ReactPointerEvent } from 'react';
-import { corridorPath } from '@/lib/map-layout';
-import type { MapLayout, Place } from '@/types/api';
+import { DashboardIcon as Maximize2, LocationIcon as Move } from "@/csmju";
+import { useRef, type PointerEvent as ReactPointerEvent } from "react";
+import { corridorPath } from "@/lib/map-layout";
+import type { MapLayout, Place } from "@/types/api";
 
 const MAP_WIDTH = 100;
 const MAP_HEIGHT = 60;
@@ -17,7 +17,7 @@ type Layout = {
 };
 
 type DragState = {
-  mode: 'move' | 'resize';
+  mode: "move" | "resize";
   pointerId: number;
   startX: number;
   startY: number;
@@ -64,7 +64,10 @@ export function PlaceLayoutEditor({
     return point.matrixTransform(matrix.inverse());
   };
 
-  const beginDrag = (mode: DragState['mode'], event: ReactPointerEvent<SVGElement>) => {
+  const beginDrag = (
+    mode: DragState["mode"],
+    event: ReactPointerEvent<SVGElement>,
+  ) => {
     const point = toMapPoint(event.clientX, event.clientY);
     if (!point) return;
     event.preventDefault();
@@ -88,25 +91,50 @@ export function PlaceLayoutEditor({
     const deltaX = point.x - drag.startX;
     const deltaY = point.y - drag.startY;
 
-    if (drag.mode === 'move') {
+    if (drag.mode === "move") {
       onChange({
         ...drag.initial,
-        positionX: snap(clamp(drag.initial.positionX + deltaX, 0, MAP_WIDTH - drag.initial.width)),
-        positionY: snap(clamp(drag.initial.positionY + deltaY, 0, MAP_HEIGHT - drag.initial.height)),
+        positionX: snap(
+          clamp(
+            drag.initial.positionX + deltaX,
+            0,
+            MAP_WIDTH - drag.initial.width,
+          ),
+        ),
+        positionY: snap(
+          clamp(
+            drag.initial.positionY + deltaY,
+            0,
+            MAP_HEIGHT - drag.initial.height,
+          ),
+        ),
       });
       return;
     }
 
     onChange({
       ...drag.initial,
-      width: snap(clamp(drag.initial.width + deltaX, MIN_SIZE, MAP_WIDTH - drag.initial.positionX)),
-      height: snap(clamp(drag.initial.height + deltaY, MIN_SIZE, MAP_HEIGHT - drag.initial.positionY)),
+      width: snap(
+        clamp(
+          drag.initial.width + deltaX,
+          MIN_SIZE,
+          MAP_WIDTH - drag.initial.positionX,
+        ),
+      ),
+      height: snap(
+        clamp(
+          drag.initial.height + deltaY,
+          MIN_SIZE,
+          MAP_HEIGHT - drag.initial.positionY,
+        ),
+      ),
     });
   };
 
   const endDrag = (event: ReactPointerEvent<SVGSVGElement>) => {
     if (dragRef.current?.pointerId !== event.pointerId) return;
-    if (svgRef.current?.hasPointerCapture(event.pointerId)) svgRef.current.releasePointerCapture(event.pointerId);
+    if (svgRef.current?.hasPointerCapture(event.pointerId))
+      svgRef.current.releasePointerCapture(event.pointerId);
     dragRef.current = null;
   };
 
@@ -114,15 +142,25 @@ export function PlaceLayoutEditor({
   const centerY = layout.positionY + layout.height / 2;
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3">
+    <section className="overflow-hidden rounded-xl border border-outline-variant/40 bg-surface">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/40 bg-white px-4 py-3">
         <div>
-          <h3 className="font-semibold text-slate-800">จัดตำแหน่งด้วยการลาก</h3>
-          <p className="text-xs text-slate-500">ลากกล่องเพื่อย้ายตำแหน่ง · ลากจุดมุมขวาล่างเพื่อปรับขนาด</p>
+          <h3 className="font-semibold text-on-surface">
+            จัดตำแหน่งด้วยการลาก
+          </h3>
+          <p className="text-caption text-on-surface-variant">
+            ลากกล่องเพื่อย้ายตำแหน่ง · ลากจุดมุมขวาล่างเพื่อปรับขนาด
+          </p>
         </div>
-        <div className="flex flex-wrap gap-2 text-xs font-medium text-slate-600">
-          <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1"><Move size={13} /> X {layout.positionX}, Y {layout.positionY}</span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1"><Maximize2 size={13} /> {layout.width} × {layout.height}</span>
+        <div className="flex flex-wrap gap-2 text-caption font-medium text-on-surface-variant">
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary-container/10 px-2.5 py-1">
+            <Move width={20} height={20} aria-hidden="true" /> X{" "}
+            {layout.positionX}, Y {layout.positionY}
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary-container/10 px-2.5 py-1">
+            <Maximize2 width={20} height={20} aria-hidden="true" />{" "}
+            {layout.width} × {layout.height}
+          </span>
         </div>
       </div>
       <svg
@@ -135,18 +173,44 @@ export function PlaceLayoutEditor({
         onPointerCancel={endDrag}
       >
         <defs>
-          <pattern id="admin-layout-grid" width="4" height="4" patternUnits="userSpaceOnUse">
-            <path d="M 4 0 L 0 0 0 4" fill="none" stroke="var(--color-map-corridor-border)" strokeWidth="0.18" />
+          <pattern
+            id="admin-layout-grid"
+            width="4"
+            height="4"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M 4 0 L 0 0 0 4"
+              fill="none"
+              stroke="var(--color-outline-variant)"
+              strokeWidth="0.18"
+            />
           </pattern>
-          <filter id="admin-layout-shadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="0.8" stdDeviation="0.8" floodColor="var(--color-map-selected-border)" floodOpacity="0.28" />
+          <filter
+            id="admin-layout-shadow"
+            x="-20%"
+            y="-20%"
+            width="140%"
+            height="140%"
+          >
+            <feDropShadow
+              dx="0"
+              dy="0.8"
+              stdDeviation="0.8"
+              floodColor="var(--color-primary-container)"
+              floodOpacity="0.28"
+            />
           </filter>
         </defs>
-        <rect width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#admin-layout-grid)" />
+        <rect
+          width={MAP_WIDTH}
+          height={MAP_HEIGHT}
+          fill="url(#admin-layout-grid)"
+        />
         <path
           d={walkwayPath}
           fill="none"
-          stroke="var(--color-map-wall-inner)"
+          stroke="var(--color-outline-variant)"
           strokeWidth={mapLayout.corridorWidth + 1}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -154,7 +218,7 @@ export function PlaceLayoutEditor({
         <path
           d={walkwayPath}
           fill="none"
-          stroke="var(--color-map-corridor-bg)"
+          stroke="var(--color-surface)"
           strokeWidth={mapLayout.corridorWidth}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -169,8 +233,8 @@ export function PlaceLayoutEditor({
                 width={place.width ?? 12}
                 height={place.height ?? 8}
                 rx="1"
-                fill="var(--color-map-slate-100)"
-                stroke="var(--color-map-wall-inner)"
+                fill="var(--color-outline-variant)"
+                stroke="var(--color-outline-variant)"
                 strokeWidth="0.35"
               />
               <text
@@ -178,7 +242,7 @@ export function PlaceLayoutEditor({
                 y={place.positionY + (place.height ?? 8) / 2 + 0.6}
                 textAnchor="middle"
                 fontSize="1.25"
-                fill="var(--color-map-wall)"
+                fill="var(--color-outline-variant)"
               >
                 {place.roomCode ?? place.nameTh.slice(0, 10)}
               </text>
@@ -191,11 +255,11 @@ export function PlaceLayoutEditor({
             width={layout.width}
             height={layout.height}
             rx="1.2"
-            fill="var(--color-map-selected-bg)"
-            stroke="var(--color-map-selected-stroke)"
+            fill="var(--color-surface)"
+            stroke="var(--color-primary-container)"
             strokeWidth="0.65"
             className="cursor-move"
-            onPointerDown={(event) => beginDrag('move', event)}
+            onPointerDown={(event) => beginDrag("move", event)}
           />
           <text
             x={centerX}
@@ -203,24 +267,24 @@ export function PlaceLayoutEditor({
             textAnchor="middle"
             fontSize={Math.max(1, Math.min(2, layout.width / 7))}
             fontWeight="700"
-            fill="var(--color-map-navy)"
+            fill="var(--color-outline-variant)"
             pointerEvents="none"
           >
-            {label || 'สถานที่ใหม่'}
+            {label || "สถานที่ใหม่"}
           </text>
           <circle
             cx={layout.positionX + layout.width}
             cy={layout.positionY + layout.height}
             r="1.45"
-            fill="var(--color-map-white)"
-            stroke="var(--color-map-selected-stroke)"
+            fill="var(--color-surface-container-lowest)"
+            stroke="var(--color-primary-container)"
             strokeWidth="0.65"
             className="cursor-nwse-resize"
-            onPointerDown={(event) => beginDrag('resize', event)}
+            onPointerDown={(event) => beginDrag("resize", event)}
           />
           <path
             d={`M ${layout.positionX + layout.width - 0.65} ${layout.positionY + layout.height + 0.2} L ${layout.positionX + layout.width + 0.2} ${layout.positionY + layout.height - 0.65}`}
-            stroke="var(--color-map-selected-stroke)"
+            stroke="var(--color-primary-container)"
             strokeWidth="0.35"
             pointerEvents="none"
           />

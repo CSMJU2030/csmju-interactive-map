@@ -1,147 +1,329 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  color-scheme: light;
+@theme {
+  --color-background: #f8f9fa;
+  --color-surface: #f8f9fa;
+  --color-surface-dim: #d9dadb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f4f5;
+  --color-surface-container: #edeeef;
+  --color-surface-container-high: #e7e8e9;
+  --color-surface-container-highest: #e1e3e4;
+  --color-surface-variant: #e1e3e4;
+  --color-on-surface: #191c1d;
+  --color-on-surface-variant: #434654;
+  --color-outline: #747686;
+  --color-outline-variant: #c4c5d7;
+  --color-primary: #003cb4;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #2154d9;
+  --color-on-primary-container: #d2daff;
+  --color-primary-fixed: #dce1ff;
+  --color-secondary: #4e5d87;
+  --color-tertiary: #003daf;
+  --color-success: #10b981;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
 
-  /* Central CSMJU design tokens (design-system package is not published yet). */
-  --csmju-color-primary: rgb(0 76 153);
-  --csmju-color-primary-hover: rgb(0 61 122);
-  --csmju-color-primary-active: rgb(0 46 92);
-  --csmju-color-primary-soft: rgb(230 242 255);
-  --csmju-color-primary-soft-hover: rgb(211 231 252);
-  --csmju-color-focus-ring: rgb(147 197 253);
-  --csmju-color-canvas: rgb(241 245 251);
-  --csmju-color-surface: rgb(255 255 255);
-  --csmju-color-surface-muted: rgb(248 250 252);
-  --csmju-color-text: rgb(15 23 42);
-  --csmju-color-text-body: rgb(51 65 85);
-  --csmju-color-text-muted: rgb(100 116 139);
-  --csmju-color-text-inverse: rgb(248 250 252);
-  --csmju-color-border: rgb(226 232 240);
-  --csmju-color-border-strong: rgb(203 213 225);
-  --csmju-color-success-text: rgb(21 128 61);
-  --csmju-color-success-bg: rgb(220 252 231);
-  --csmju-color-warning-text: rgb(180 83 9);
-  --csmju-color-warning-bg: rgb(254 243 199);
-  --csmju-color-danger-text: rgb(185 28 28);
-  --csmju-color-danger-bg: rgb(254 226 226);
-  --csmju-color-info-text: rgb(0 76 153);
-  --csmju-color-info-bg: rgb(230 242 255);
-  --csmju-radius-sm: 0.5rem;
-  --csmju-radius-md: 0.75rem;
-  --csmju-radius-lg: 1rem;
-  --csmju-font-heading: system-ui, sans-serif;
-  --csmju-font-body: system-ui, sans-serif;
+  /* Brand accents */
+  --color-accent: #3b80f2;
+  --color-brand-navy: #16264d;
+  --color-brand-blue: #0d4fa8;
+  --color-brand-amber: #f59e0b;
+  --color-sso: #2d8a61;
+  --color-sso-container: #e8f5ee;
 
-  background: var(--csmju-color-canvas);
+  /* Plus Jakarta Sans has no Thai glyphs: Thai headings fall through to Noto Sans Thai (ui-design-system.md 4.1). */
+  --font-display: var(--font-jakarta), var(--font-noto-thai), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-noto-thai), ui-sans-serif, system-ui, sans-serif;
 
-  /* Category Map Palette */
-  --color-cat-classroom-fill: theme('colors.blue.100');
-  --color-cat-classroom-stroke: theme('colors.blue.600');
-  --color-cat-lab-fill: theme('colors.teal.100');
-  --color-cat-lab-stroke: theme('colors.teal.700');
-  --color-cat-office-fill: theme('colors.purple.100');
-  --color-cat-office-stroke: theme('colors.purple.700');
-  --color-cat-dept-fill: theme('colors.amber.100');
-  --color-cat-dept-stroke: theme('colors.amber.700');
-  --color-cat-meeting-fill: theme('colors.rose.100');
-  --color-cat-meeting-stroke: theme('colors.rose.700');
-  --color-cat-restroom-fill: theme('colors.cyan.100');
-  --color-cat-restroom-stroke: theme('colors.cyan.600');
-  --color-cat-entrance-fill: theme('colors.green.100');
-  --color-cat-entrance-stroke: theme('colors.green.700');
-  --color-cat-facility-fill: theme('colors.orange.100');
-  --color-cat-facility-stroke: theme('colors.orange.600');
-  --color-cat-club-fill: theme('colors.pink.100');
-  --color-cat-club-stroke: theme('colors.pink.600');
-  --color-cat-storage-fill: theme('colors.amber.100');
-  --color-cat-storage-stroke: theme('colors.amber.600');
-  --color-cat-other-fill: theme('colors.slate.100');
-  --color-cat-other-stroke: theme('colors.slate.500');
-
-  /* Map Architectural SVG Tokens */
-  --color-map-wall: theme('colors.slate.400');
-  --color-map-wall-inner: theme('colors.slate.300');
-  --color-map-corridor-border: theme('colors.slate.200');
-  --color-map-corridor-bg: theme('colors.slate.50');
-  --color-map-corridor-grid: theme('colors.slate.100');
-  --color-map-guideline: theme('colors.slate.300');
-  --color-map-text: theme('colors.slate.500');
-  --color-map-text-dark: theme('colors.slate.800');
-  --color-map-room-text: theme('colors.slate.900');
-  --color-map-room-subtext: theme('colors.slate.700');
-  --color-map-selected-border: theme('colors.sky.800');
-  --color-map-selected-bg: theme('colors.sky.100');
-  --color-map-selected-stroke: theme('colors.sky.600');
-  --color-map-selected-light: theme('colors.blue.300');
-  --color-map-selected-point: theme('colors.amber.500');
-  --color-map-selected-point-stroke: theme('colors.amber.700');
-  --color-map-white: theme('colors.white');
-  --color-map-slate-100: theme('colors.slate.100');
-  --color-map-slate-200: theme('colors.slate.200');
-  --color-map-slate-300: theme('colors.slate.300');
-  --color-map-navy: theme('colors.slate.800');
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 1.2;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 800;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 1.3;
+  --text-headline-lg--font-weight: 700;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 1.4;
+  --text-headline-md--font-weight: 600;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.6;
+  --text-label-md: 14px;
+  --text-label-md--line-height: 1.2;
+  --text-label-md--letter-spacing: 0.01em;
+  --text-label-md--font-weight: 600;
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 16px;
+  --text-label-sm--font-weight: 600;
+  --text-caption: 12px;
+  --text-caption--line-height: 1.2;
 }
 
 body {
-  margin: 0;
-  background: var(--csmju-color-canvas);
-  color: var(--csmju-color-text-body);
-  font-family: var(--csmju-font-body);
-  line-height: 1.7;
+  background: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
+/* ---------- Brand surfaces ---------- */
+.brand-gradient {
+  background: linear-gradient(135deg, var(--color-brand-navy) 0%, var(--color-brand-blue) 100%);
+}
+.glow-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  z-index: 0;
 }
 
-:focus-visible {
-  outline: 3px solid var(--csmju-color-focus-ring);
-  outline-offset: 2px;
+.bg-btn-gradient {
+  background: linear-gradient(90deg, var(--color-primary-container) 0%, var(--color-accent) 100%);
+}
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-primary-container) 0%, var(--color-accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ---------- Buttons ---------- */
+.btn-gradient {
+  background: linear-gradient(90deg, var(--color-primary-container) 0%, var(--color-accent) 100%);
+  background-size: 200% auto;
+  transition: all 150ms ease-out;
+}
+.btn-gradient:hover {
+  transform: scale(1.02);
+  background-position: right center;
+}
+.btn-gradient:active {
+  transform: scale(0.98);
+}
+.btn-loading {
+  pointer-events: none;
+}
+.btn-loading .btn-text {
+  opacity: 0;
+}
+.dots {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+.dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #fff;
+  opacity: 0.35;
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.btn-loading .dots {
+  opacity: 1;
+}
+@keyframes dotPulse {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0) scale(0.85);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1);
+  }
+}
+
+/* ---------- Inputs ---------- */
+.input-field {
+  transition: all 150ms ease-in-out;
+}
+.input-field:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  border-color: var(--color-accent);
+  outline: none;
+}
+.input-field::placeholder {
+  transition: opacity 150ms ease-in-out;
+}
+.input-field:focus::placeholder {
+  opacity: 0.5;
+}
+.input-error {
+  border-color: var(--color-error) !important;
+  color: var(--color-error);
+}
+.input-error:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-error) 20%, transparent) !important;
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+.shake-anim {
+  animation: shake 400ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* ---------- Checkbox ---------- */
+.custom-checkbox {
+  position: relative;
+}
+.custom-checkbox input[type="checkbox"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
+  transition: all 200ms ease-in-out;
+}
+.custom-checkbox input[type="checkbox"]:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  animation: pop 200ms ease-in-out;
+}
+.custom-checkbox input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.custom-checkbox input[type="checkbox"]:checked::after {
+  transform: rotate(45deg) scale(1);
+}
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ---------- Links ---------- */
+.link-hover {
+  position: relative;
+  text-decoration: none;
+}
+.link-hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 250ms ease-out;
+}
+.link-hover:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+.link-hover:hover {
+  color: var(--color-primary);
+}
+
+/* ---------- Entrance animations ---------- */
+.fade-slide-up {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeSlideUp 300ms ease-out forwards;
+}
+@keyframes fadeSlideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.stagger-1 {
+  animation-delay: 80ms;
+}
+.stagger-2 {
+  animation-delay: 160ms;
+}
+.stagger-3 {
+  animation-delay: 240ms;
+}
+
+/* ---------- Split panel swap ---------- */
+.panel-anim {
+  transition: transform 480ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (min-width: 768px) {
+  .forgot-mode .brand-panel-anim {
+    transform: translateX(138.095%);
+  }
+  .forgot-mode .form-area-anim {
+    transform: translateX(-72.414%);
+  }
+}
+.form-section-anim {
+  transition: opacity 480ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 480ms cubic-bezier(0.4, 0, 0.2, 1), visibility 480ms;
+}
+.form-section-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+  .dots span {
+    animation-duration: 2s;
   }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  .panel-anim,
+  .form-section-anim,
+  .btn-gradient,
+  .input-field {
+    transition-duration: 1ms;
   }
-}
-
-@layer components {
-  .card {
-    @apply rounded-card border border-slate-200 bg-white;
-  }
-
-  .control {
-    @apply min-h-11 rounded-xl border border-slate-300 bg-white px-3 text-base transition focus:border-brand-600 focus:ring-2 focus:ring-brand-100;
-  }
-
-  .button-primary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-700 px-4 py-2 font-medium text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-50;
-  }
-
-  .button-secondary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50;
+  .fade-slide-up {
+    animation-duration: 1ms;
   }
 }

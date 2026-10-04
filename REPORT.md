@@ -1,3 +1,11 @@
+## ล่าสุด: นำชุด UI กลางเข้าเว็บและเตรียมลงทะเบียน — 4 ตุลาคม 2026
+
+**ยังไม่ผ่านทุกข้อ / ยังไม่พร้อม merge หรือ production.** นำ shared template UI1.3.1 จาก standards main เข้าโดยคง standards1.7.0 ตามทีมสั่ง; ไม่แก้ source กลาง. แก้ Tailwindv4/next-font/shell/logo/forms/pagination/feedback/focusและkeyboardalternative แล้ว. ดู [audit รายหมวด0–20](docs/ui-design-system-audit.md) และ [provenance/ปัญหาที่ต้องแก้ส่วนกลาง](docs/ui-template-provenance.md).
+
+ผล local: backend245tests, frontend7tests, lint/typecheck/build และ standards19checksผ่าน. Browserabout5ขนาดและmobilemenukeyboardผ่านเฉพาะขอบเขตที่ตรวจ. ยังขาดLighthouse/axe/เครื่องจริง/PLreview และL3บนCoreจริง. ผู้ใช้ยังไม่ได้รับอนุมัติและเลือกยื่นเอง; เตรียม [ข้อมูลกรอกลงทะเบียน](docs/core-hub-registration.md) แล้ว. พอร์ต3202ต้องยืนยันกับทีมก่อนยื่น.
+
+ส่วนด้านล่างเป็นประวัติการตรวจรอบก่อน ไม่ใช้แทนสถานะล่าสุดนี้.
+
 # REPORT — csmju-interactive-map
 
 ## ล่าสุด: cleanup และ UI audit — 4 ตุลาคม 2026
