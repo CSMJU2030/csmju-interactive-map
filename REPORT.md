@@ -1,5 +1,15 @@
 # REPORT — csmju-interactive-map
 
+## ล่าสุด: cleanup และ UI audit — 4 ตุลาคม 2026
+
+**ยังไม่ผ่าน UI design system ทั้งฉบับ.** อ่านเอกสาร main ฉบับ UI 1.3.1 ทุกหมวดและตรวจ source/browser แล้ว พบข้อผิดจริงใน tokens/fonts/AppShell/forms/dialogs/states/error mapping/accessibility. รายละเอียดและหลักฐานรายหมวด: [ui-design-system-audit.md](docs/ui-design-system-audit.md).
+
+ลบไฟล์สไลด์ใน scripts และ demo ใน examples รวม 3 ไฟล์; ไม่พบ runtime reference. ตัดเอกสาร มาตรฐาน และ tests ออกจาก Docker build context โดยเก็บไว้ใน Git ตามหน้าที่. `pnpm build` หลัง cleanup ผ่านทั้ง NestJS/Next.js บน Node 22.22.0. ยังไม่ได้ build Docker image.
+
+Template กลางมีแล้วใน `csmju2030-standards/templates/csmju-subsystem-web` บน main standards 1.7.2 (ไม่อยู่ใน tag 1.7.0); ข้อมูลเรื่อง template ในรายงานวันที่ 3 ตุลาคมด้านล่างเป็นประวัติ. รอบนี้ยัง pin standards 1.7.0 ตามทีมสั่ง และยังไม่ได้นำ template เข้าเว็บ.
+
+เปิด frontend preview `http://localhost:3202` และ backend `4202`; health 200, migrations/seed ผ่านในฐานข้อมูล preview แยก. หน้า about ไม่มี overflow ที่ 360/390/768/1280/1920px แต่พบ breakpoint/layout/font/title ไม่ตรงมาตรฐาน. Core Hub แสดง not_found สำหรับทะเบียน csmju-interactive-map จึงยังตรวจหน้าที่ต้องเข้าสู่ระบบจริงและ L3 ไม่ได้.
+
 วันที่ตรวจ: 3 ตุลาคม 2026. **สถานะ: แก้โค้ดและตรวจในเครื่องแล้ว ยังไม่รับรองผ่านทุกมาตรฐานหรือ L3** เพราะทะเบียน Core Hub ยังไม่สร้าง, ไม่มีบัญชี conformance บน server จริง, template UI กลางที่เอกสารกำหนดยังหาไม่พบใน repo
 
 ## อัปเดต standards v1.7.0 — 4 ตุลาคม 2026
