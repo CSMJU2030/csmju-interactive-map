@@ -1,0 +1,13 @@
+import type { components } from './generated-api';
+type Schemas = components['schemas'];
+export type Place = Schemas['PlaceResponseDto'];
+export type PlaceCategory = Place['category'];
+export type LecturerSummary = Schemas['LecturerSummaryDto'];
+export type Lecturer = Schemas['LecturerResponseDto'];
+export type MapPoint = Schemas['MapPointDto'];
+export type MapLayout = Schemas['MapLayoutDto'];
+export type PaginationMeta = Schemas['PaginationMetaDto'];
+export type CurrentUser = Schemas['CurrentUserDto'];
+export type DashboardStats = Schemas['DashboardStatsDto'];
+export type ErrorResponse = Schemas['ApiErrorEnvelopeDto'];
+export type SuccessResponse<T> = Omit<Schemas['ApiEnvelopeDto'], 'data'> & { data: T };

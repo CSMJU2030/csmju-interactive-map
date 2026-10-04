@@ -1,0 +1,30 @@
+frontend build: Done
+✅ [QA-05/06] ผ่านการตรวจ package manager และ workspace filter
+
+--- [Exception Validation] check-exceptions.sh ---
+✅ [EXC-01] ไม่พบ .compliance-exceptions.yml (ไม่มี exception ใช้งานอยู่)
+
+==================================================================
+ Summary
+==================================================================
+  ✅ PASS  Convention Check            check-branch-name.sh
+  ✅ PASS  Convention Check            check-commit-messages.sh
+  ✅ PASS  Convention Check            check-ci-untouched.sh
+  ✅ PASS  Standards Version Check     check-submodule-pointer.sh
+  ✅ PASS  Security & Stack Scan       check-no-secrets.sh
+  ✅ PASS  Security & Stack Scan       check-no-local-storage.sh
+  ✅ PASS  Security & Stack Scan       check-no-jwt-verify.sh
+  ✅ PASS  Security & Stack Scan       check-db-isolation.sh
+  ✅ PASS  Security & Stack Scan       check-authorized-deps.sh
+  ✅ PASS  Security & Stack Scan       check-backend-nestjs.sh
+  ✅ PASS  API Contract Sync           check-openapi-sync.sh
+  ✅ PASS  API Contract Sync           check-api-conventions.sh
+  ✅ PASS  Data Dictionary Compliance  check-field-aliases.sh
+  ✅ PASS  Data Dictionary Compliance  check-snake-case.sh
+  ✅ PASS  Data Dictionary Compliance  check-no-hardcoded-faculty.sh
+  ✅ PASS  Data Dictionary Compliance  check-money-fields.sh
+  ✅ PASS  UI Token Compliance         check-ui-tokens.sh
+  ✅ PASS  Code Quality                check-qa.sh
+  ✅ PASS  Exception Validation        check-exceptions.sh
+
+✅ All 19 checks passed.

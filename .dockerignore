@@ -1,0 +1,22 @@
+.git
+.github
+.next
+**/.next
+**/dist
+**/node_modules
+coverage
+**/coverage
+.env
+**/.env
+**/.env.local
+*.log
+
+# Development evidence and standards are not runtime assets.
+standards
+docs
+REPORT.md
+scripts
+examples
+.vscode
+**/*.spec.ts
+backend/test

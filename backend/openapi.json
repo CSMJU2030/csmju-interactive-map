@@ -1,0 +1,2155 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/me": {
+      "get": {
+        "operationId": "MeController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Verified Core Hub identity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CurrentUserDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Me"
+        ],
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ]
+      }
+    },
+    "/auth/login": {
+      "get": {
+        "operationId": "SsoController_login",
+        "parameters": [],
+        "responses": {
+          "302": {
+            "description": "Core Hub SSO redirect"
+          }
+        },
+        "tags": [
+          "Sso"
+        ]
+      }
+    },
+    "/auth/callback": {
+      "get": {
+        "operationId": "SsoController_callback",
+        "parameters": [],
+        "responses": {
+          "302": {
+            "description": "Core Hub SSO redirect"
+          }
+        },
+        "tags": [
+          "Sso"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "SsoController_logout",
+        "parameters": [],
+        "responses": {
+          "303": {
+            "description": "Core Hub SSO redirect"
+          }
+        },
+        "tags": [
+          "Sso"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Service health check",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/places": {
+      "get": {
+        "operationId": "PlacesController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Partial match across names, room code, lecturers, and keywords",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CLASSROOM",
+                "COMPUTER_LAB",
+                "LECTURER_OFFICE",
+                "DEPARTMENT_OFFICE",
+                "MEETING_ROOM",
+                "RESTROOM",
+                "ENTRANCE",
+                "FACILITY",
+                "STUDENT_CLUB",
+                "STORAGE",
+                "OTHER"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlaceResponseDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "List and optionally filter places",
+        "tags": [
+          "places"
+        ]
+      },
+      "post": {
+        "operationId": "PlacesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePlaceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PlaceResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          },
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Create a place (editor or admin)",
+        "tags": [
+          "places"
+        ]
+      }
+    },
+    "/api/v1/places/search": {
+      "get": {
+        "operationId": "PlacesController_search",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "lab",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlaceResponseDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Search places by room, keyword, or lecturer",
+        "tags": [
+          "places"
+        ]
+      }
+    },
+    "/api/v1/places/admin-list": {
+      "get": {
+        "operationId": "PlacesController_adminList",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Partial match across names, room code, lecturers, and keywords",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CLASSROOM",
+                "COMPUTER_LAB",
+                "LECTURER_OFFICE",
+                "DEPARTMENT_OFFICE",
+                "MEETING_ROOM",
+                "RESTROOM",
+                "ENTRANCE",
+                "FACILITY",
+                "STUDENT_CLUB",
+                "STORAGE",
+                "OTHER"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlaceResponseDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          },
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "List active and inactive places for administration",
+        "tags": [
+          "places"
+        ]
+      }
+    },
+    "/api/v1/places/stats": {
+      "get": {
+        "operationId": "PlacesController_stats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DashboardStatsDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          },
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Return dashboard counts for editors and admins",
+        "tags": [
+          "places"
+        ]
+      }
+    },
+    "/api/v1/places/layout-config": {
+      "get": {
+        "operationId": "PlacesController_mapLayout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MapLayoutDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Return the editable map corridor layout",
+        "tags": [
+          "places"
+        ]
+      }
+    },
+    "/api/v1/places/core-rooms": {
+      "get": {
+        "operationId": "PlacesController_coreRooms",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CoreRoomDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "tags": [
+          "places"
+        ]
+      }
+    },
+    "/api/v1/places/{id}": {
+      "get": {
+        "operationId": "PlacesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PlaceResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Get a place by UUID",
+        "tags": [
+          "places"
+        ]
+      },
+      "patch": {
+        "operationId": "PlacesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlaceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PlaceResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          },
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Update a place (editor or admin)",
+        "tags": [
+          "places"
+        ]
+      },
+      "delete": {
+        "operationId": "PlacesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeletedRecordDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          },
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Delete a place (admin only)",
+        "tags": [
+          "places"
+        ]
+      }
+    },
+    "/api/v1/places/layout": {
+      "patch": {
+        "operationId": "PlacesController_updateLayout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePlacesLayoutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/BulkLayoutDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          },
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Update positions and sizes for multiple places",
+        "tags": [
+          "places"
+        ]
+      }
+    },
+    "/api/v1/lecturers": {
+      "get": {
+        "operationId": "LecturersController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "personnelType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TEACHER",
+                "STAFF"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LecturerResponseDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "List lecturers with their assigned offices",
+        "tags": [
+          "lecturers"
+        ]
+      },
+      "post": {
+        "operationId": "LecturersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLecturerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LecturerResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          },
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "tags": [
+          "lecturers"
+        ]
+      }
+    },
+    "/api/v1/lecturers/search": {
+      "get": {
+        "operationId": "LecturersController_search",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "personnelType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TEACHER",
+                "STAFF"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LecturerResponseDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Search lecturers by partial name or email",
+        "tags": [
+          "lecturers"
+        ]
+      }
+    },
+    "/api/v1/lecturers/core-people": {
+      "get": {
+        "operationId": "LecturersController_corePeople",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "personnelType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TEACHER",
+                "STAFF"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CorePersonOptionDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "tags": [
+          "lecturers"
+        ]
+      }
+    },
+    "/api/v1/lecturers/{id}": {
+      "patch": {
+        "operationId": "LecturersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLecturerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/LecturerResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          },
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "tags": [
+          "lecturers"
+        ]
+      },
+      "delete": {
+        "operationId": "LecturersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/DeletedRecordDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          },
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "tags": [
+          "lecturers"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "CSMJU Interactive Map API",
+    "description": "REST API for the CSMJU2030 Interactive Map subsystem",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "core-hub-bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      },
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "csmju_interactive_map_access_token"
+      }
+    },
+    "schemas": {
+      "LecturerSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "personCode": {
+            "type": "string"
+          },
+          "nameTh": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "personnelType": {
+            "type": "string",
+            "enum": [
+              "TEACHER",
+              "STAFF"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "personCode",
+          "nameTh",
+          "nameEn",
+          "email",
+          "personnelType"
+        ]
+      },
+      "PlaceResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "roomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "nameTh": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "CLASSROOM",
+              "COMPUTER_LAB",
+              "LECTURER_OFFICE",
+              "DEPARTMENT_OFFICE",
+              "MEETING_ROOM",
+              "RESTROOM",
+              "ENTRANCE",
+              "FACILITY",
+              "STUDENT_CLUB",
+              "STORAGE",
+              "OTHER"
+            ]
+          },
+          "positionX": {
+            "type": "number"
+          },
+          "positionY": {
+            "type": "number"
+          },
+          "width": {
+            "type": "number",
+            "nullable": true
+          },
+          "height": {
+            "type": "number",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "lecturers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LecturerSummaryDto"
+            }
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "roomCode",
+          "nameTh",
+          "nameEn",
+          "description",
+          "category",
+          "positionX",
+          "positionY",
+          "width",
+          "height",
+          "isActive",
+          "lecturers",
+          "keywords",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaginationMetaDto": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ]
+      },
+      "ApiEnvelopeDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "data": {
+            "type": "object"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMetaDto"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "ApiErrorDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "ApiErrorEnvelopeDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "error": {
+            "$ref": "#/components/schemas/ApiErrorDto"
+          }
+        },
+        "required": [
+          "success",
+          "error"
+        ]
+      },
+      "Object": {
+        "type": "object",
+        "properties": {}
+      },
+      "DashboardStatsDto": {
+        "type": "object",
+        "properties": {
+          "totalPlaces": {
+            "type": "number"
+          },
+          "totalClassrooms": {
+            "type": "number"
+          },
+          "totalLabs": {
+            "type": "number"
+          },
+          "totalLecturerOffices": {
+            "type": "number"
+          },
+          "totalActive": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "totalPlaces",
+          "totalClassrooms",
+          "totalLabs",
+          "totalLecturerOffices",
+          "totalActive"
+        ]
+      },
+      "MapPointDto": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ]
+      },
+      "MapLayoutDto": {
+        "type": "object",
+        "properties": {
+          "corridorPoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MapPointDto"
+            }
+          },
+          "corridorWidth": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "corridorPoints",
+          "corridorWidth"
+        ]
+      },
+      "CoreRoomDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "nameTh": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "nameTh",
+          "isActive",
+          "updatedAt"
+        ]
+      },
+      "CreatePlaceDto": {
+        "type": "object",
+        "properties": {
+          "roomCode": {
+            "type": "string",
+            "example": "LAB-03"
+          },
+          "nameTh": {
+            "type": "string",
+            "description": "ชื่อจุดบนแผนที่ที่ไม่ใช่ห้องของ Core Hub"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "CLASSROOM",
+              "COMPUTER_LAB",
+              "LECTURER_OFFICE",
+              "DEPARTMENT_OFFICE",
+              "MEETING_ROOM",
+              "RESTROOM",
+              "ENTRANCE",
+              "FACILITY",
+              "STUDENT_CLUB",
+              "STORAGE",
+              "OTHER"
+            ]
+          },
+          "positionX": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "positionY": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "width": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 12
+          },
+          "height": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 8
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "keywords": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "category",
+          "positionX",
+          "positionY"
+        ]
+      },
+      "BulkLayoutDto": {
+        "type": "object",
+        "properties": {
+          "places": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlaceResponseDto"
+            }
+          },
+          "mapLayout": {
+            "$ref": "#/components/schemas/MapLayoutDto"
+          }
+        },
+        "required": [
+          "places",
+          "mapLayout"
+        ]
+      },
+      "PlaceLayoutItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "positionX": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "positionY": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 60
+          },
+          "width": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "height": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 60
+          }
+        },
+        "required": [
+          "id",
+          "positionX",
+          "positionY",
+          "width",
+          "height"
+        ]
+      },
+      "CorridorPointDto": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "y": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 60
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ]
+      },
+      "UpdateCorridorDto": {
+        "type": "object",
+        "properties": {
+          "corridorPoints": {
+            "minItems": 2,
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CorridorPointDto"
+            }
+          },
+          "corridorWidth": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 12
+          }
+        },
+        "required": [
+          "corridorPoints",
+          "corridorWidth"
+        ]
+      },
+      "UpdatePlacesLayoutDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlaceLayoutItemDto"
+            }
+          },
+          "corridor": {
+            "$ref": "#/components/schemas/UpdateCorridorDto"
+          }
+        }
+      },
+      "UpdatePlaceDto": {
+        "type": "object",
+        "properties": {
+          "roomCode": {
+            "type": "string",
+            "example": "LAB-03"
+          },
+          "nameTh": {
+            "type": "string",
+            "description": "ชื่อจุดบนแผนที่ที่ไม่ใช่ห้องของ Core Hub"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "CLASSROOM",
+              "COMPUTER_LAB",
+              "LECTURER_OFFICE",
+              "DEPARTMENT_OFFICE",
+              "MEETING_ROOM",
+              "RESTROOM",
+              "ENTRANCE",
+              "FACILITY",
+              "STUDENT_CLUB",
+              "STORAGE",
+              "OTHER"
+            ]
+          },
+          "positionX": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "positionY": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "width": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 12
+          },
+          "height": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 8
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "keywords": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DeletedRecordDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "deleted"
+        ]
+      },
+      "AssignmentPlaceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "roomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "nameTh": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "CLASSROOM",
+              "COMPUTER_LAB",
+              "LECTURER_OFFICE",
+              "DEPARTMENT_OFFICE",
+              "MEETING_ROOM",
+              "RESTROOM",
+              "ENTRANCE",
+              "FACILITY",
+              "STUDENT_CLUB",
+              "STORAGE",
+              "OTHER"
+            ]
+          },
+          "positionX": {
+            "type": "number"
+          },
+          "positionY": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "roomCode",
+          "nameTh",
+          "nameEn",
+          "category",
+          "positionX",
+          "positionY",
+          "isActive"
+        ]
+      },
+      "LecturerResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "personCode": {
+            "type": "string"
+          },
+          "nameTh": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "personnelType": {
+            "type": "string",
+            "enum": [
+              "TEACHER",
+              "STAFF"
+            ]
+          },
+          "sourceId": {
+            "type": "number",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionAcademic": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionManager": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageProfile": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "education": {
+            "type": "string",
+            "nullable": true
+          },
+          "academicType": {
+            "type": "string",
+            "nullable": true
+          },
+          "placeId": {
+            "type": "string",
+            "nullable": true
+          },
+          "place": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AssignmentPlaceDto"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "personCode",
+          "nameTh",
+          "nameEn",
+          "email",
+          "personnelType",
+          "sourceId",
+          "title",
+          "positionAcademic",
+          "positionManager",
+          "imageProfile",
+          "phone",
+          "education",
+          "academicType",
+          "placeId",
+          "place",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CorePersonOptionDto": {
+        "type": "object",
+        "properties": {
+          "personCode": {
+            "type": "string"
+          },
+          "nameTh": {
+            "type": "string"
+          },
+          "personnelType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "personCode",
+          "nameTh",
+          "personnelType"
+        ]
+      },
+      "CreateLecturerDto": {
+        "type": "object",
+        "properties": {
+          "personCode": {
+            "type": "string",
+            "description": "personCode จาก Core Hub"
+          },
+          "placeId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "personCode"
+        ]
+      },
+      "UpdateLecturerDto": {
+        "type": "object",
+        "properties": {
+          "personCode": {
+            "type": "string",
+            "description": "personCode จาก Core Hub"
+          },
+          "placeId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        }
+      },
+      "SessionDto": {
+        "type": "object",
+        "properties": {
+          "expiresAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "expiresAt"
+        ]
+      },
+      "CurrentUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "coreRole": {
+            "type": "string",
+            "enum": [
+              "student",
+              "alumni",
+              "staff",
+              "lecturer",
+              "guest",
+              "admin"
+            ]
+          },
+          "subsystemRole": {
+            "type": "string",
+            "enum": [
+              "STUDENT",
+              "ALUMNI",
+              "STAFF",
+              "ADMIN"
+            ]
+          },
+          "session": {
+            "$ref": "#/components/schemas/SessionDto"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "coreRole",
+          "subsystemRole",
+          "session"
+        ]
+      }
+    }
+  }
+}
