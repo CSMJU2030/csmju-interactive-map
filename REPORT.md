@@ -2,6 +2,15 @@
 
 วันที่ตรวจ: 3 ตุลาคม 2026. **สถานะ: แก้โค้ดและตรวจในเครื่องแล้ว ยังไม่รับรองผ่านทุกมาตรฐานหรือ L3** เพราะทะเบียน Core Hub ยังไม่สร้าง, ไม่มีบัญชี conformance บน server จริง, template UI กลางที่เอกสารกำหนดยังหาไม่พบใน repo
 
+## อัปเดต standards v1.7.0 — 4 ตุลาคม 2026
+
+- รวม upstream main `1bc5dd8` และปัก `.standards-version` / gitlink / `subsystem.yaml` / README / คู่มือตรงกับ v1.7.0 (`88c4ce86271df943da1ffd1fde80633dfdd16a47`). ไฟล์ CI และ CODEOWNERS ตรงกับ upstream
+- Push เข้า PR #5: https://github.com/CSMJU2030/csmju-interactive-map/pull/5
+- **GitHub CI ผ่านครบ 8/8 jobs** ที่ commit `74b00d1de19602802e98ba5abe5e2cb53c4db62d`: https://github.com/CSMJU2030/csmju-interactive-map/actions/runs/37197742871
+- Local lint / typecheck / test / production build ผ่าน; tests 246/246 (backend 245, frontend 1). รอบ PowerShell ใช้ Node 26.7.0 จึงมี engine warning; GitHub CI ตรวจซ้ำด้วย Node 22 ตามมาตรฐานและผ่าน
+- run-all-checks.sh ของ v1.7.0 รันใน WSL ด้วย Node 22 adapter: **All 19 checks passed**, exit 0; ไม่มี skip ใน GH-02/03/04 รอบนี้. QA ตรวจ lint/typecheck/test/build ซ้ำด้วย Node 22 และผ่าน. ผลท้ายสคริปต์: [compliance-v170-summary.log](docs/verification/compliance-v170-summary.log)
+- ยังไม่รับรอง live-server conformance L3: ต้องลงทะเบียน APPROVED/ACTIVE และมีบัญชีทดสอบจริงก่อน
+
 ## มาตรฐานและ reference
 
 - `.standards-version`: **1.7.0** — เวอร์ชันที่ทีมกำหนดและตรงกับ upstream main วันที่ 4 ตุลาคม 2026
