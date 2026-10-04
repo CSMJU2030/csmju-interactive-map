@@ -2,7 +2,7 @@
 # schema: standards/schemas/subsystem.schema.json
 
 name: csmju-interactive-map
-standards_version: "1.7.1"
+standards_version: "1.7.0"
 conformance_level: L3
 
 base_url: http://localhost:3202

@@ -1,6 +1,6 @@
 # เตรียมลงทะเบียน Core Hub — Interactive Map
 
-ตรวจตาม standards v1.7.1 วันที่ 3 ตุลาคม 2026 โดยยังไม่มีทะเบียน/บัญชี conformance/พอร์ตที่ผู้ดูแลจัดสรรให้ จึงยังไม่รับรอง L3
+ตรวจตาม standards v1.7.0 วันที่ 4 ตุลาคม 2026 โดยยังไม่มีทะเบียน/บัญชี conformance/พอร์ตที่ผู้ดูแลจัดสรรให้ จึงยังไม่รับรอง L3
 
 ## รายการลงทะเบียน
 
@@ -57,6 +57,6 @@ node standards/conformance/run.js --manifest ./subsystem.yaml --level L3
 
 ## แหล่งอ้างอิง
 
-- Standards: https://github.com/CSMJU2030/csmju2030-standards/tree/v1.7.1 — commit cf297f01dac5b5a5120e424f7f3b4819be101556
+- Standards: https://github.com/CSMJU2030/csmju2030-standards/tree/v1.7.0 — commit 88c4ce86271df943da1ffd1fde80633dfdd16a47
 - Auth/common/core-hub reference: demo-student-subsystem — commit 6724d707dcb05fd212e19d01d29514e9ad866847
 - เอกสารใน submodule: connect-core-hub.md, auth-contract.md, reference-data.md, conformance.md, ui-design-system.md และ github-workflow.md

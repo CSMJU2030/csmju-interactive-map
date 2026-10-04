@@ -1,6 +1,6 @@
 # CSMJU Interactive Map
 
-ระบบแผนที่ Next.js + NestJS + Prisma/PostgreSQL สำหรับ CSMJU2030 ใช้มาตรฐาน v1.7.1 และ SSO ของ Core Hub เท่านั้น สถานะปัจจุบันเป็น **เตรียมลงทะเบียน ยังไม่ได้รับรอง conformance L3 บน server จริง** ดูผลจริงใน [REPORT.md](REPORT.md) และ [คู่มือลงทะเบียน](docs/core-hub-integration.md)
+ระบบแผนที่ Next.js + NestJS + Prisma/PostgreSQL สำหรับ CSMJU2030 ใช้มาตรฐาน v1.7.0 และ SSO ของ Core Hub เท่านั้น สถานะปัจจุบันเป็น **เตรียมลงทะเบียน ยังไม่ได้รับรอง conformance L3 บน server จริง** ดูผลจริงใน [REPORT.md](REPORT.md) และ [คู่มือลงทะเบียน](docs/core-hub-integration.md)
 
 ## สถาปัตยกรรมและข้อมูล
 

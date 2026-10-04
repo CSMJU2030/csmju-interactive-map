@@ -4,12 +4,12 @@
 
 ## มาตรฐานและ reference
 
-- `.standards-version`: **1.7.1** — GitHub tag ล่าสุดที่ตรวจพบ
-- `standards` เป็น submodule จริง: commit `cf297f01dac5b5a5120e424f7f3b4819be101556` ตรง tag v1.7.1. gitlink และ .gitmodules อยู่ใน index แล้ว ยังไม่ได้ commit
+- `.standards-version`: **1.7.0** — เวอร์ชันที่ทีมกำหนดและตรงกับ upstream main วันที่ 4 ตุลาคม 2026
+- `standards` เป็น submodule จริง: commit `88c4ce86271df943da1ffd1fde80633dfdd16a47` ตรง tag v1.7.0; gitlink commit แล้ว
 - auth/common/core-hub คัดลอก reference demo commit `6724d707dcb05fd212e19d01d29514e9ad866847`. ปรับ permission เฉพาะโดเมนและ imports ให้ตรง Prisma ของระบบ
 - Core Hub จริง health และ JWKS ตอบได้; ยังไม่ทดสอบ authenticated Core API ด้วยบัญชีจริง
 
-## ผลตรวจที่ได้จริง
+## ผลตรวจเดิมวันที่ 3 ตุลาคม 2026 (standards v1.7.1)
 
 | รายการ | ผล |
 |---|---|
@@ -55,4 +55,4 @@ L3 ผ่าน 71 PASS / 0 FAIL / 0 SKIP; Core build/typecheck/lint และ u
 
 ## Checkout สำหรับส่ง PR
 
-โฟลเดอร์ csmju-interactive-map-publish clone จาก main 4282bd51ce75fb246c27b20bb6751faab8df918c และใช้ branch feature/interactive-map/compliance-fixes; นำ source/generated contracts/tests/report เข้ามาและเก็บ .github จาก upstream. standards gitlink ตรง v1.7.1 และ secret scan ผ่าน. ส่งงานผ่าน feature branch เพื่อเปิด PR; ผล GitHub CI และ conformance บน server จริงต้องตรวจเพิ่มเติมก่อน merge/deploy.
+โฟลเดอร์ csmju-interactive-map-publish clone จาก main 4282bd51ce75fb246c27b20bb6751faab8df918c และใช้ branch feature/interactive-map/compliance-fixes; นำ source/generated contracts/tests/report เข้ามาและเก็บ .github จาก upstream. standards gitlink ปรับเป็น v1.7.0 ตาม upstream main; ผล secret scan ของรอบก่อนผ่าน. ส่งงานผ่าน feature branch เพื่อเปิด PR; ผล GitHub CI และ conformance บน server จริงต้องตรวจเพิ่มเติมก่อน merge/deploy.
