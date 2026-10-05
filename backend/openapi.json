@@ -1194,6 +1194,105 @@
         ]
       }
     },
+    "/api/v1/lecturers/directory": {
+      "get": {
+        "operationId": "LecturersController_directory",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "personnelType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TEACHER",
+                "STAFF"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PersonnelDirectoryDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "core-hub-bearer": []
+          }
+        ],
+        "summary": "Read the active department personnel directory from Core Hub",
+        "tags": [
+          "lecturers"
+        ]
+      }
+    },
     "/api/v1/lecturers/{id}": {
       "patch": {
         "operationId": "LecturersController_update",
@@ -2063,6 +2162,49 @@
           "personCode",
           "nameTh",
           "personnelType"
+        ]
+      },
+      "PersonnelDirectoryDto": {
+        "type": "object",
+        "properties": {
+          "personCode": {
+            "type": "string"
+          },
+          "nameTh": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "personnelType": {
+            "type": "string",
+            "enum": [
+              "TEACHER",
+              "STAFF"
+            ]
+          },
+          "positionAcademic": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionManager": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "personCode",
+          "nameTh",
+          "nameEn",
+          "email",
+          "personnelType",
+          "positionAcademic",
+          "positionManager"
         ]
       },
       "CreateLecturerDto": {

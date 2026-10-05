@@ -52,6 +52,41 @@ export class LecturersService {
     return {data:filtered.slice((query.page-1)*query.limit,query.page*query.limit),total:filtered.length};
   }
 
+  // The directory includes people without local office assignments. Never cache or save it.
+  async directory(query: LecturerListQueryDto, token: string) {
+    const params = new URLSearchParams({
+      personType: 'STAFF', status: 'ACTIVE', limit: '100', page: '1',
+      departmentCode: this.config.get<string>('personnelDepartmentCode', 'CS'),
+    });
+    if (query.q?.trim()) params.set('q', query.q.trim());
+    const people: CorePerson[] = [];
+    let totalPages = 1;
+    for (let page = 1; page <= totalPages; page++) {
+      params.set('page', String(page));
+      const body = await this.coreData('/people?' + params.toString(), token);
+      if (!Array.isArray(body.data) || !body.data.every((person: CorePerson) =>
+        person && typeof person.personCode === 'string' && typeof person.fullNameTh === 'string' && person.personType === 'STAFF',
+      )) throw coreHubFailure(new Error('Invalid Core Hub personnel directory'));
+      const pages = body.meta?.totalPages;
+      if (typeof pages !== 'number' || !Number.isInteger(pages) || pages < 0) {
+        throw coreHubFailure(new Error('Invalid Core Hub personnel pagination'));
+      }
+      if (page === 1) totalPages = pages;
+      people.push(...body.data as CorePerson[]);
+    }
+    const data = people.map(person => ({
+      personCode: person.personCode,
+      nameTh: person.fullNameTh,
+      nameEn: person.fullNameEn ?? null,
+      personnelType: person.staffType === 'LECTURER' ? 'TEACHER' as const : 'STAFF' as const,
+      positionAcademic: person.academicTitle ?? null,
+      positionManager: person.jobTitle ?? null,
+      email: person.universityEmail ?? null,
+    })).filter(person => !query.personnelType || person.personnelType === query.personnelType)
+      .sort((left, right) => left.nameTh.localeCompare(right.nameTh, 'th'));
+    return { data: data.slice((query.page - 1) * query.limit, query.page * query.limit), total: data.length };
+  }
+
   async create(dto: CreateLecturerDto, token: string) {
     const person = await this.person(dto.personCode, token);
     if(dto.placeId) await this.ensurePlace(dto.placeId, token);

@@ -21,10 +21,10 @@ export function LocationsView() {
     [attempt, setAttempt] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
-    setFailure(null);
     const timer = setTimeout(
       () => {
+        setLoading(true);
+        setFailure(null);
         void apiRequest<Place[]>(
           "/api/v1/places?" +
             new URLSearchParams({

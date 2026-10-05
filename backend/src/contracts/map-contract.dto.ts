@@ -50,6 +50,11 @@ export class LecturerResponseDto extends LecturerSummaryDto {
   @ApiProperty({format:'date-time'}) createdAt!: string;
   @ApiProperty({format:'date-time'}) updatedAt!: string;
 }
+export class PersonnelDirectoryDto extends PickType(LecturerResponseDto, [
+  'personCode', 'nameTh', 'nameEn', 'personnelType',
+  'positionAcademic', 'positionManager', 'email',
+] as const) {}
+
 export class SessionDto {
   @ApiProperty({type:String,nullable:true,format:'date-time'}) expiresAt!: string | null;
 }

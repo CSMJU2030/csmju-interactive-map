@@ -17,7 +17,6 @@ import {
   DeleteIcon as Trash2,
 } from "@/csmju";
 import {
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -103,7 +102,9 @@ export function BulkLayoutEditor({
   const [message, setMessage] = useState("");
   const [messageError, setMessageError] = useState(false);
 
-  useEffect(() => {
+  const [source, setSource] = useState({ places, mapLayout });
+  if (source.places !== places || source.mapLayout !== mapLayout) {
+    setSource({ places, mapLayout });
     setLayouts(layoutsFromPlaces(places));
     setCorridorPoints(copyPoints(mapLayout.corridorPoints));
     setCorridorWidth(mapLayout.corridorWidth);
@@ -111,7 +112,7 @@ export function BulkLayoutEditor({
       places.some(({ id }) => id === current) ? current : null,
     );
     setSelectedPoint(null);
-  }, [mapLayout, places]);
+  }
 
   const changedItems = useMemo(
     () =>

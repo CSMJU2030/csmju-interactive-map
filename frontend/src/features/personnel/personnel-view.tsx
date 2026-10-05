@@ -2,14 +2,11 @@
 
 import { cardClass, inputClass } from "@/csmju";
 import {
-  SchoolIcon as GraduationCap,
   MailIcon as Mail,
-  AccountCircleIcon as Phone,
   SearchIcon as Search,
   PersonIcon as UserRound,
   GroupIcon as UsersRound,
 } from "@/csmju";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
   LoadingState,
@@ -18,7 +15,7 @@ import {
   Pagination,
 } from "@/components/common/ui-feedback";
 import { apiRequest } from "@/lib/api";
-import type { Lecturer } from "@/types/api";
+import type { PersonnelDirectory } from "@/types/api";
 
 type PersonnelFilter = "ALL" | "TEACHER" | "STAFF";
 
@@ -29,7 +26,7 @@ const filters: Array<{ value: PersonnelFilter; label: string }> = [
 ];
 
 export function PersonnelView() {
-  const [personnel, setPersonnel] = useState<Lecturer[]>([]);
+  const [personnel, setPersonnel] = useState<PersonnelDirectory[]>([]);
   const [filter, setFilter] = useState<PersonnelFilter>("ALL");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -47,7 +44,7 @@ export function PersonnelView() {
         const params = new URLSearchParams({ limit: "20", page: String(page) });
         if (query.trim()) params.set("q", query.trim());
         if (filter !== "ALL") params.set("personnelType", filter);
-        void apiRequest<Lecturer[]>("/api/v1/lecturers?" + params.toString())
+        void apiRequest<PersonnelDirectory[]>("/api/v1/lecturers/directory?" + params.toString())
           .then((response) => {
             if (active) {
               setPersonnel(response.data);
@@ -143,31 +140,23 @@ export function PersonnelView() {
       {!loading && !error && (
         <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
           {personnel.map((person) => (
-            <article key={person.id} className={`${cardClass} overflow-hidden`}>
+            <article key={person.personCode} className={`${cardClass} overflow-hidden`}>
               <div className="flex gap-4 p-5">
-                {person.imageProfile ? (
-                  <Image
-                    src={person.imageProfile}
-                    alt={`${person.title ?? ""}${person.nameTh}`}
-                    width={96}
-                    height={112}
-                    className="h-28 w-24 shrink-0 rounded-xl bg-surface object-cover object-top"
-                  />
-                ) : (
+
                   <span className="grid h-28 w-24 shrink-0 place-items-center rounded-xl bg-surface text-on-surface-variant">
                     <UserRound width={20} height={20} aria-hidden="true" />
                   </span>
-                )}
+
                 <div className="min-w-0">
                   <span
-                    className={`inline-flex rounded-full px-2.5 py-1 text-caption font-semibold ${person.personnelType === "TEACHER" ? "bg-primary-container/10 text-primary-container" : "bg-primary-container/10 text-primary-container"}`}
+                    className="inline-flex rounded-full bg-primary-container/10 px-2.5 py-1 text-caption font-semibold text-primary-container"
                   >
                     {person.personnelType === "TEACHER"
                       ? "คณาจารย์"
                       : "เจ้าหน้าที่"}
                   </span>
                   <h2 className="mt-2 text-lg font-bold leading-snug text-on-surface">
-                    {person.title}
+
                     {person.nameTh}
                   </h2>
                   {person.nameEn && (
@@ -184,17 +173,7 @@ export function PersonnelView() {
               </div>
               <div className="space-y-2 border-t border-outline-variant/40 px-5 py-4 text-label-md text-on-surface-variant">
                 {person.positionManager && <p>{person.positionManager}</p>}
-                {person.education && (
-                  <p className="flex gap-2">
-                    <GraduationCap
-                      className="mt-0.5 shrink-0 text-on-surface-variant"
-                      width={20}
-                      height={20}
-                      aria-hidden="true"
-                    />
-                    <span>{person.education}</span>
-                  </p>
-                )}
+
                 {person.email && (
                   <a
                     className="flex items-center gap-2 hover:text-primary-container"
@@ -207,20 +186,6 @@ export function PersonnelView() {
                       aria-hidden="true"
                     />
                     {person.email}
-                  </a>
-                )}
-                {person.phone && (
-                  <a
-                    className="flex items-center gap-2 hover:text-primary-container"
-                    href={`tel:${person.phone.replace(/[^0-9+]/g, "")}`}
-                  >
-                    <Phone
-                      className="shrink-0 text-on-surface-variant"
-                      width={20}
-                      height={20}
-                      aria-hidden="true"
-                    />
-                    {person.phone}
                   </a>
                 )}
               </div>
@@ -245,7 +210,7 @@ export function PersonnelView() {
         <Pagination page={page} totalPages={totalPages} onChange={setPage} />
       )}
       <p className="text-caption text-on-surface-variant">
-        ข้อมูลอ้างอิงจากเว็บไซต์สาขาวิชาวิทยาการคอมพิวเตอร์ มหาวิทยาลัยแม่โจ้
+        ข้อมูลคณาจารย์และเจ้าหน้าที่จาก Core Hub
       </p>
     </div>
   );

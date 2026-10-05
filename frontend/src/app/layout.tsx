@@ -34,7 +34,11 @@ export default function RootLayout({
       className={`${jakarta.variable} ${noto.variable} h-full antialiased`}
     >
       <body className="min-h-screen font-body text-body-md text-on-surface">
-        <AppShell>{children}</AppShell>
+        <AppShell
+          coreHubUrl={process.env.CORE_HUB_WEB_URL ?? process.env.NEXT_PUBLIC_CORE_HUB_WEB_URL}
+        >
+          {children}
+        </AppShell>
       </body>
     </html>
   );

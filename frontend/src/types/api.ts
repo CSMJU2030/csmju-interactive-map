@@ -4,6 +4,7 @@ export type Place = Schemas['PlaceResponseDto'];
 export type PlaceCategory = Place['category'];
 export type LecturerSummary = Schemas['LecturerSummaryDto'];
 export type Lecturer = Schemas['LecturerResponseDto'];
+export type PersonnelDirectory = Schemas['PersonnelDirectoryDto'];
 export type MapPoint = Schemas['MapPointDto'];
 export type MapLayout = Schemas['MapLayoutDto'];
 export type PaginationMeta = Schemas['PaginationMetaDto'];

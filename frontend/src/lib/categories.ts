@@ -23,12 +23,12 @@ export const categoryColors: Record<
     stroke: "var(--color-primary-container)",
   },
   COMPUTER_LAB: {
-    fill: "var(--color-primary-fixed)",
-    stroke: "var(--color-primary-container)",
+    fill: "var(--color-sso-container)",
+    stroke: "var(--color-sso)",
   },
   LECTURER_OFFICE: {
-    fill: "var(--color-primary-fixed)",
-    stroke: "var(--color-primary-container)",
+    fill: "color-mix(in srgb, var(--color-secondary) 12%, var(--color-surface-container-lowest))",
+    stroke: "var(--color-secondary)",
   },
   DEPARTMENT_OFFICE: {
     fill: "var(--color-primary-fixed)",
@@ -39,24 +39,24 @@ export const categoryColors: Record<
     stroke: "var(--color-primary-container)",
   },
   RESTROOM: {
-    fill: "var(--color-primary-fixed)",
-    stroke: "var(--color-primary-container)",
+    fill: "color-mix(in srgb, var(--color-accent) 15%, var(--color-surface-container-lowest))",
+    stroke: "var(--color-accent)",
   },
   ENTRANCE: {
     fill: "var(--color-primary-fixed)",
     stroke: "var(--color-primary-container)",
   },
   FACILITY: {
-    fill: "var(--color-primary-fixed)",
-    stroke: "var(--color-primary-container)",
+    fill: "color-mix(in srgb, var(--color-brand-amber) 18%, var(--color-surface-container-lowest))",
+    stroke: "color-mix(in srgb, var(--color-brand-amber) 60%, var(--color-error))",
   },
   STUDENT_CLUB: {
-    fill: "var(--color-primary-fixed)",
-    stroke: "var(--color-primary-container)",
+    fill: "var(--color-error-container)",
+    stroke: "var(--color-error)",
   },
   STORAGE: {
-    fill: "var(--color-primary-fixed)",
-    stroke: "var(--color-primary-container)",
+    fill: "color-mix(in srgb, var(--color-brand-amber) 12%, var(--color-surface-container-lowest))",
+    stroke: "var(--color-brand-amber)",
   },
   OTHER: {
     fill: "var(--color-primary-fixed)",

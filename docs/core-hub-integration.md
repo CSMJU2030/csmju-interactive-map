@@ -1,6 +1,6 @@
 # เตรียมลงทะเบียน Core Hub — Interactive Map
 
-ตรวจตาม standards v1.7.0 วันที่ 4 ตุลาคม 2026 โดยยังไม่มีทะเบียน/บัญชี conformance/พอร์ตที่ผู้ดูแลจัดสรรให้ จึงยังไม่รับรอง L3
+ตรวจตาม standards v1.7.4 วันที่ 5 ตุลาคม 2026 โดยยังไม่มีทะเบียน/บัญชี conformance/พอร์ตที่ผู้ดูแลจัดสรรให้ จึงยังไม่รับรอง L3
 
 ## รายการลงทะเบียน
 
@@ -9,15 +9,15 @@
 | System ID / ชื่อระบบ | `csmju-interactive-map` ต้องตรงกับ SUBSYSTEM_ID และ subsystem.yaml |
 | Display name | CSMJU Interactive Map |
 | Core API / เว็บ | https://csmju2030.jowave.com |
-| Frontend / Backend ในเครื่อง | `3202` / `4202` เป็นค่าชั่วคราว ต้องยืนยันพอร์ตกับผู้ดูแล |
-| Callback URL | `http://localhost:3202/auth/callback` เมื่อได้รับพอร์ตนี้จริง |
+| Frontend / Backend ในเครื่อง | `3216` / `4202` เป็นค่าชั่วคราว ต้องยืนยันพอร์ตกับผู้ดูแล |
+| Callback URL | `http://localhost:3216/auth/callback` เมื่อได้รับพอร์ตนี้จริง |
 | Base URL ในทะเบียนช่วงทดสอบ localhost | เว้นว่าง ตาม connect-core-hub.md ข้อ 3 |
-| Base URL สำหรับ runner ใน subsystem.yaml | `http://localhost:3202` |
+| Base URL สำหรับ runner ใน subsystem.yaml | `http://localhost:3216` |
 | Core role → subsystem role | student→STUDENT, alumni→ALUMNI, guest→ALUMNI, staff→STAFF, lecturer→STAFF, admin→ADMIN |
 
 คนลงทะเบียนด้วยบัญชีเจ้าของระบบในหลังบ้าน Core Hub แล้วให้ admin ระบบกลางอนุมัติและเปิด ACTIVE. หากพอร์ตเปลี่ยน ให้แก้ frontend scripts, backend PORT/CORS_ORIGIN, BACKEND_INTERNAL_URL, compose และ subsystem.yaml ให้ตรงกันก่อนส่งทะเบียน. callback ใช้ frontend และ hostname localhost
 
-เริ่ม sign-in จาก `http://localhost:3202/auth/login` เท่านั้น ไม่ส่ง token ในแชต ไม่สร้างบัญชีหรือทะเบียนแทนคน
+เริ่ม sign-in จาก `http://localhost:3216/auth/login` เท่านั้น ไม่ส่ง token ในแชต ไม่สร้างบัญชีหรือทะเบียนแทนคน
 
 ## Environment
 
@@ -57,6 +57,6 @@ node standards/conformance/run.js --manifest ./subsystem.yaml --level L3
 
 ## แหล่งอ้างอิง
 
-- Standards: https://github.com/CSMJU2030/csmju2030-standards/tree/v1.7.0 — commit 88c4ce86271df943da1ffd1fde80633dfdd16a47
+- Standards: https://github.com/CSMJU2030/csmju2030-standards/tree/v1.7.4 — commit 00fedda3855e7bd4c6ab419c48333bfcd0bf7e6c
 - Auth/common/core-hub reference: demo-student-subsystem — commit 6724d707dcb05fd212e19d01d29514e9ad866847
 - เอกสารใน submodule: connect-core-hub.md, auth-contract.md, reference-data.md, conformance.md, ui-design-system.md และ github-workflow.md
