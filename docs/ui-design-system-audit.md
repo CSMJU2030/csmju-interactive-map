@@ -46,7 +46,7 @@ Standards ปรับเป็น **1.7.4** พร้อม UI document **1.3.2
 
 ## Core Hub และการส่งงาน
 
-ผู้ใช้ยืนยันว่ายังไม่ได้อนุมัติเข้า Core Hub และจะยื่นเอง. จัดข้อมูลที่ตรงกับ manifest/code ไว้ใน [core-hub-registration.md](core-hub-registration.md). พอร์ต3202/4202 เป็นค่าปัจจุบัน ต้องยืนยันพอร์ตที่ทีมจัดสรรก่อนยื่น. ต้อง APPROVED/ACTIVE และมีบัญชี conformance นอก repo จึงรัน L3จริงได้. ไม่ใช้ mock identity แทนผล Core จริง.
+ผู้ใช้ยืนยันว่ายังไม่ได้อนุมัติเข้า Core Hub และจะยื่นเอง. จัดข้อมูลที่ตรงกับ manifest/code ไว้ใน [core-hub-registration.md](core-hub-registration.md). พอร์ต3216/4202 เป็นค่าปัจจุบัน ต้องยืนยันพอร์ตที่ทีมจัดสรรก่อนยื่น. ต้อง APPROVED/ACTIVE และมีบัญชี conformance นอก repo จึงรัน L3จริงได้. ไม่ใช้ mock identity แทนผล Core จริง.
 
 ไฟล์ scripts/slides/examples ที่ไม่ใช่ runtime ลบแล้วใน commitก่อน; Docker context ไม่รวม docs/standards/tests. เก็บ migrations/contracts/CI/tests ใน Git ตามหน้าที่.
 

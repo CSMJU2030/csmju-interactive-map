@@ -10,8 +10,8 @@ services:
       NODE_ENV: development
       PORT: 4202
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/csmju_interactive_map_db?schema=public
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3202}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3202}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3216}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3216}
       SUBSYSTEM_ID: csmju-interactive-map
       CORE_HUB_URL: ${CORE_HUB_URL:-https://csmju2030.jowave.com}
       CORE_HUB_JWKS_URL: ${CORE_HUB_JWKS_URL:-https://csmju2030.jowave.com/api/v1/.well-known/jwks.json}
