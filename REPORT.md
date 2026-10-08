@@ -1,6 +1,6 @@
 ## ล่าสุด: อัปเดต standards v1.8.4 — 8 ตุลาคม 2026
 
-อัปเดต .standards-version และ submodule จาก 1.7.4 เป็น 1.8.4 พร้อม Dockerfile เว็บ, Next.js standalone, .dockerignore, compose web/api และ connection pool ตามข้อกำหนดใหม่. DEP-01..04, compose config, lint, typecheck, build และ unit tests 258/258 ผ่าน. ยังไม่ได้ทดสอบ Docker runtime (Engine ไม่เปิด), full compliance/CI หรือ conformance รอบนี้; ยังไม่ได้ commit/push. รายละเอียดและข้อจำกัด: [standards-v184.md](docs/verification/standards-v184.md).
+อัปเดต .standards-version และ submodule จาก 1.7.4 เป็น 1.8.4 พร้อม Dockerfile เว็บ, Next.js standalone, .dockerignore, compose web/api และ connection pool ตามข้อกำหนดใหม่. ตรวจซ้ำด้วย Node 22.22.0: static compliance 18 scripts, OpenAPI sync, QA (lint/typecheck/build/tests 258/258), generated frontend types และ compose config ผ่าน. รวม origin/main เพื่อรับ workflow สร้าง images ของส่วนกลางและแก้ merge conflicts โดยคงฟีเจอร์ล่าสุด. ส่งผ่าน feature branch/PR #6 และตรวจ CI ของ commit ล่าสุดแยกต่างหาก; ยังไม่ได้ทดสอบ Docker runtime (Engine ไม่เปิด) หรือ conformance บน server จริง. รายละเอียดและข้อจำกัด: [standards-v184.md](docs/verification/standards-v184.md).
 
 ## รายชื่อคณาจารย์และเจ้าหน้าที่จาก Core Hub — 5 ตุลาคม 2026
 
