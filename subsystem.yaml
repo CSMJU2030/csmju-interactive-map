@@ -2,10 +2,10 @@
 # schema: standards/schemas/subsystem.schema.json
 
 name: csmju-interactive-map
-standards_version: "1.7.4"
+standards_version: "1.8.4"
 conformance_level: L3
 
-base_url: http://localhost:3216
+base_url: https://csmju-interactive-map.jowave.com
 core_hub_url: https://csmju2030.jowave.com
 core_hub_web_url: https://csmju2030.jowave.com
 callback_path: /auth/callback

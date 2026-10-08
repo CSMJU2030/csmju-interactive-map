@@ -1,5 +1,7 @@
 # CSMJU Interactive Map
 
+Production URL: https://csmju-interactive-map.jowave.com · SSO callback: https://csmju-interactive-map.jowave.com/auth/callback (ผู้ใช้ยืนยันวันที่ 8 ตุลาคม 2026). ตรวจ HTTP ครั้งนี้ยังตอบ 503 จาก Apache; การรันในเครื่องใช้ http://localhost:3216 ตามเดิม.
+
 ระบบแผนที่ Next.js + NestJS + Prisma/PostgreSQL สำหรับ CSMJU2030 ใช้มาตรฐาน v1.8.4 และ SSO ของ Core Hub เท่านั้น สถานะปัจจุบันเป็น **เตรียมลงทะเบียน ยังไม่ได้รับรอง conformance L3 บน server จริง** ดูผลจริงใน [REPORT.md](REPORT.md) และ [คู่มือลงทะเบียน](docs/core-hub-integration.md)
 
 Frontend ใช้ Next.js และ eslint-config-next 16.3.6 พร้อม UI template 1.3.2 จาก tag v1.7.4. ปุ่ม “กลับ CSMJU Portal” ใน sidebar อ่าน `CORE_HUB_WEB_URL` จาก environment ของ frontend; รองรับ `NEXT_PUBLIC_CORE_HUB_WEB_URL` เดิมเมื่อยังไม่ได้ตั้งค่าใหม่.

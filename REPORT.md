@@ -115,3 +115,6 @@ L3 ผ่าน 71 PASS / 0 FAIL / 0 SKIP; Core build/typecheck/lint และ u
 ## Checkout สำหรับส่ง PR
 
 โฟลเดอร์ csmju-interactive-map-publish clone จาก main 4282bd51ce75fb246c27b20bb6751faab8df918c และใช้ branch feature/interactive-map/compliance-fixes; นำ source/generated contracts/tests/report เข้ามาและเก็บ .github จาก upstream. standards gitlink ปรับเป็น v1.7.0 ตาม upstream main; ผล secret scan ของรอบก่อนผ่าน. ส่งงานผ่าน feature branch เพื่อเปิด PR; ผล GitHub CI และ conformance บน server จริงต้องตรวจเพิ่มเติมก่อน merge/deploy.
+## URL production ที่ยืนยัน — 8 ตุลาคม 2026
+
+ผู้ใช้ยืนยัน Base URL `https://csmju-interactive-map.jowave.com` และ Callback `https://csmju-interactive-map.jowave.com/auth/callback`. ปรับ subsystem.yaml และคู่มือให้ตรงกัน พร้อมแก้ standards_version ใน manifest เป็น 1.8.4 ให้ตรงกับ .standards-version. ตรวจ HTTP โดยไม่ส่งบัญชีหรือ token พบว่า `/`, `/api/health`, `/auth/login` และ `/auth/callback` ตอบ 503 Service Unavailable จาก Apache; ยังไม่ได้แก้หรือยืนยันสถานะ services/reverse proxy/ทะเบียนบน server. เว็บ local ยังคงรันที่ localhost:3216.
