@@ -1,6 +1,6 @@
 # CSMJU Interactive Map
 
-ระบบแผนที่ Next.js + NestJS + Prisma/PostgreSQL สำหรับ CSMJU2030 ใช้มาตรฐาน v1.7.4 และ SSO ของ Core Hub เท่านั้น สถานะปัจจุบันเป็น **เตรียมลงทะเบียน ยังไม่ได้รับรอง conformance L3 บน server จริง** ดูผลจริงใน [REPORT.md](REPORT.md) และ [คู่มือลงทะเบียน](docs/core-hub-integration.md)
+ระบบแผนที่ Next.js + NestJS + Prisma/PostgreSQL สำหรับ CSMJU2030 ใช้มาตรฐาน v1.8.4 และ SSO ของ Core Hub เท่านั้น สถานะปัจจุบันเป็น **เตรียมลงทะเบียน ยังไม่ได้รับรอง conformance L3 บน server จริง** ดูผลจริงใน [REPORT.md](REPORT.md) และ [คู่มือลงทะเบียน](docs/core-hub-integration.md)
 
 Frontend ใช้ Next.js และ eslint-config-next 16.3.6 พร้อม UI template 1.3.2 จาก tag v1.7.4. ปุ่ม “กลับ CSMJU Portal” ใน sidebar อ่าน `CORE_HUB_WEB_URL` จาก environment ของ frontend; รองรับ `NEXT_PUBLIC_CORE_HUB_WEB_URL` เดิมเมื่อยังไม่ได้ตั้งค่าใหม่.
 
@@ -54,6 +54,14 @@ pnpm --filter @csmju-interactive-map/backend exec ts-node prisma/restore-referen
 ```
 
 ชื่อห้องยังอ่านจาก Core Hub และแก้ไขตำแหน่งต่อได้ในหน้า `/admin` สคริปต์นี้แยกจาก seed ปกติและไม่รันใน production
+
+## ทดสอบด้วย Docker
+
+รัน `docker compose up -d --build` แล้วเปิด `http://localhost:3216` โดยใช้ service `web` (3000) ส่งต่อไป `api` (4000) ตาม standards 1.8.4; API ไม่เปิดพอร์ตออกสู่ host ส่วนการรัน `pnpm dev` ยังใช้พอร์ต 3216/4202 ตามเดิม
+
+Dockerfile ฝั่งเว็บฝัง `BACKEND_INTERNAL_URL=http://api:4000` ตอน build การเปลี่ยนปลายทางต้อง build image ใหม่ ฐานข้อมูลจำกัด connection ด้วย `DATABASE_POOL_MAX` (ค่าเริ่มต้น 5) Compose นี้ใช้ฐานข้อมูล local และคุกกี้สำหรับ HTTP; ค่าของ production ให้ตั้งตาม `standards/docs/deployment.md`
+
+ผลตรวจการอัปเดต: [standards-v184.md](docs/verification/standards-v184.md)
 
 ## ตรวจงาน
 

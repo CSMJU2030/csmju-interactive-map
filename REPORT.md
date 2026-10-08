@@ -1,4 +1,8 @@
-## ล่าสุด: รายชื่อคณาจารย์และเจ้าหน้าที่จาก Core Hub — 5 ตุลาคม 2026
+## ล่าสุด: อัปเดต standards v1.8.4 — 8 ตุลาคม 2026
+
+อัปเดต .standards-version และ submodule จาก 1.7.4 เป็น 1.8.4 พร้อม Dockerfile เว็บ, Next.js standalone, .dockerignore, compose web/api และ connection pool ตามข้อกำหนดใหม่. DEP-01..04, compose config, lint, typecheck, build และ unit tests 258/258 ผ่าน. ยังไม่ได้ทดสอบ Docker runtime (Engine ไม่เปิด), full compliance/CI หรือ conformance รอบนี้; ยังไม่ได้ commit/push. รายละเอียดและข้อจำกัด: [standards-v184.md](docs/verification/standards-v184.md).
+
+## รายชื่อคณาจารย์และเจ้าหน้าที่จาก Core Hub — 5 ตุลาคม 2026
 
 หน้า `/personnel` ใช้ directory ของบุคลากร ACTIVE สาขา CS จาก Core Hub แทนรายการกำหนดห้องในฐานข้อมูลระบบย่อย จึงแสดงคนที่ยังไม่ได้กำหนดห้องด้วย. เพิ่ม API `/api/v1/lecturers/directory` ที่ใช้ JWT ของผู้เรียกและสิทธิ์ lecturer:read; ไม่ cache หรือบันทึกชื่อ/ข้อมูลติดต่อ. อ่านครบทุกหน้า Core ก่อนกรองประเภทและแบ่งหน้าในเว็บ; รองรับค้นหาชื่อ/รหัส. เปลี่ยนสาขาได้ด้วย PERSONNEL_DEPARTMENT_CODE.
 
