@@ -7,8 +7,7 @@
 coverage
 **/coverage
 .env
-**/.env
-**/.env.local
+**/.env*
 *.log
 
 # Development evidence and standards are not runtime assets.

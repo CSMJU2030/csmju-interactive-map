@@ -3,11 +3,11 @@
 import { cardClass } from "@/csmju";
 import { DescriptionIcon as QrCode } from "@/csmju";
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useState } from "react";
+import { useBrowserLocation } from "@/lib/browser-location";
 
 export function QrMapCard() {
-  const [url, setUrl] = useState("/map");
-  useEffect(() => setUrl(`${window.location.origin}/map`), []);
+  const location = useBrowserLocation();
+  const url = location ? `${new URL(location).origin}/map` : "/map";
 
   return (
     <details className={`${cardClass} group p-4`}>

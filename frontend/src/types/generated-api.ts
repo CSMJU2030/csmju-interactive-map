@@ -273,6 +273,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/lecturers/directory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read the active department personnel directory from Core Hub */
+        get: operations["LecturersController_directory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/lecturers/{id}": {
         parameters: {
             query?: never;
@@ -469,6 +486,16 @@ export interface components {
             personCode: string;
             nameTh: string;
             personnelType: string;
+        };
+        PersonnelDirectoryDto: {
+            personCode: string;
+            nameTh: string;
+            nameEn: string | null;
+            email: string | null;
+            /** @enum {string} */
+            personnelType: "TEACHER" | "STAFF";
+            positionAcademic: string | null;
+            positionManager: string | null;
         };
         CreateLecturerDto: {
             /** @description personCode จาก Core Hub */
@@ -1001,6 +1028,35 @@ export interface operations {
                         /** @enum {boolean} */
                         success: true;
                         data: components["schemas"]["CorePersonOptionDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    LecturersController_directory: {
+        parameters: {
+            query?: {
+                page?: components["schemas"]["Object"];
+                limit?: components["schemas"]["Object"];
+                q?: string;
+                personnelType?: "TEACHER" | "STAFF";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: true;
+                        data: components["schemas"]["PersonnelDirectoryDto"][];
                         meta: components["schemas"]["PaginationMetaDto"];
                     };
                 };

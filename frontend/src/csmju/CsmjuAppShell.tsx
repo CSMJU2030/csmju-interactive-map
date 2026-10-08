@@ -6,6 +6,7 @@ import { useState } from "react";
 import CsmjuLogo from "./CsmjuLogo";
 import {
   AddIcon,
+  ArrowBackIcon,
   CampaignIcon,
   CloseIcon,
   DashboardIcon,
@@ -71,11 +72,17 @@ export default function CsmjuAppShell({
   nav,
   primaryAction,
   user,
+  coreHubUrl,
   children,
 }: {
   /** Subsystem name shown in the mobile top bar, e.g. "ระบบครุภัณฑ์". */
   displayName: string;
   nav: NavItem[];
+  /**
+   * Core Hub web origin (env CORE_HUB_WEB_URL), for the "back to the portal"
+   * link every subsystem shows (ui-design-system.md 1, 5.1). No link when unset.
+   */
+  coreHubUrl?: string;
   /** Optional gradient button under the logo, e.g. { label: "สร้างประกาศใหม่", href: "/news/new" }. */
   primaryAction?: { label: string; href: string };
   user: { initials: string; roleLabel: string };
@@ -115,6 +122,20 @@ export default function CsmjuAppShell({
               <CloseIcon className="h-5 w-5" />
             </button>
           </div>
+
+          {coreHubUrl && (
+            // Out of this subsystem to the Core Hub portal the user signed in
+            // from — a real navigation to another origin, so <a>, not Link.
+            <a
+              href={coreHubUrl}
+              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-label-md text-white/80 transition-colors hover:bg-white/10 hover:text-white ${
+                primaryAction ? "mb-4" : ""
+              }`}
+            >
+              <ArrowBackIcon className="h-4 w-4 shrink-0" />
+              กลับ CSMJU Portal
+            </a>
+          )}
 
           {primaryAction && (
             <Link
@@ -171,7 +192,7 @@ export default function CsmjuAppShell({
       </aside>
 
       {/* MAIN */}
-      <main id="main" className="ml-0 flex min-h-dvh flex-1 flex-col md:ml-64">
+      <main id="main" className="ml-0 flex min-h-dvh min-w-0 flex-1 flex-col md:ml-64">
         <header className="sticky top-0 z-10 flex h-16 w-full items-center justify-between gap-4 border-b border-surface-variant bg-surface-container-lowest px-4 shadow-sm md:px-12">
           <div className="flex items-center gap-2 md:hidden">
             <button

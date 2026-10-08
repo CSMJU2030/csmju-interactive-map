@@ -20,6 +20,7 @@ import {
 import { apiRequest } from "@/lib/api";
 import { categoryLabels } from "@/lib/categories";
 import { defaultMapLayout } from "@/lib/map-layout";
+import { useBrowserLocation } from "@/lib/browser-location";
 import type { MapLayout, Place, PlaceCategory } from "@/types/api";
 
 type CategoryFilter = "ALL" | PlaceCategory;
@@ -40,7 +41,9 @@ const filters: Array<{ value: CategoryFilter; label: string }> = [
 export function MapExplorer() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [mapLayout, setMapLayout] = useState<MapLayout>(defaultMapLayout);
-  const [query, setQuery] = useState("");
+  const location = useBrowserLocation();
+  const [queryOverride, setQuery] = useState<string | null>(null);
+  const query = queryOverride ?? (location ? new URL(location).searchParams.get("q") ?? "" : "");
   const [category, setCategory] = useState<CategoryFilter>("ALL");
   const [selected, setSelected] = useState<Place | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,11 +52,6 @@ export function MapExplorer() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const initial = new URLSearchParams(window.location.search).get("q");
-    if (initial) setQuery(initial);
-  }, []);
 
   const loadPlaces = useCallback(async (search: string) => {
     setLoading(true);
@@ -135,7 +133,9 @@ export function MapExplorer() {
     );
   }, [places]);
 
-  useEffect(() => {
+  const [filterSource, setFilterSource] = useState(places);
+  if (filterSource !== places) {
+    setFilterSource(places);
     if (
       category !== "ALL" &&
       !places.some((place) => place.category === category)
@@ -143,7 +143,7 @@ export function MapExplorer() {
       setCategory("ALL");
       setSelected(null);
     }
-  }, [category, places]);
+  }
 
   const filteredPlaces = useMemo(
     () =>
@@ -165,8 +165,8 @@ export function MapExplorer() {
   };
 
   return (
-    <div className="space-y-8">
-      <div inert={drawerOpen} className="space-y-8">
+    <div className="min-w-0 space-y-8">
+      <div inert={drawerOpen} className="min-w-0 space-y-8">
         <section className={`${cardClass} p-4 md:p-6`}>
           <label htmlFor="map-search" className="mb-2 block text-label-md">
             ค้นหาห้อง สถานที่ หรืออาจารย์
@@ -302,10 +302,10 @@ export function MapExplorer() {
         )}
 
         <div
-          className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]"
+          className="grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]"
           ref={mapRef}
         >
-          <div>
+          <div className="min-w-0">
             <InteractiveSvgMap
               places={filteredPlaces}
               mapLayout={mapLayout}

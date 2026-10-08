@@ -1,10 +1,10 @@
-# UI design system audit — 4 ตุลาคม 2026 (หลังแก้โค้ด)
+# UI design system audit — อัปเดตรุ่น 5 ตุลาคม 2026
 
-**ยังรับรอง “ผ่านทุกข้อ” ไม่ได้ และยังไม่พร้อม merge/deploy production.** อ่าน UI document 1.3.1 ทุกหมวด 0–20; แก้โค้ดและทดสอบสิ่งที่ทำได้แล้ว แต่ Core Hub ยังไม่ APPROVED/ACTIVE และ review/runtime evidence ยังไม่ครบ.
+**ยังรับรอง “ผ่านทุกข้อ” ไม่ได้ และยังไม่พร้อม merge/deploy production.** อ่าน UI document 1.3.2 ทุกหมวด 0–20; แก้โค้ดและทดสอบสิ่งที่ทำได้แล้ว แต่ Core Hub ยังไม่ APPROVED/ACTIVE และ review/runtime evidence ยังไม่ครบ.
 
 ## รุ่นและขอบเขต
 
-Standards ที่ทีมกำหนดยังเป็น **1.7.0** ในทั้งสามจุด. ใช้ UI template จาก standards main commit `02ed4503d15b80103efcecf67c99a3e4621d36f7` เพราะไม่มี template ใน tag v1.7.0. ดู [provenance และข้อจำกัดส่วนกลาง](ui-template-provenance.md). ไม่แก้ source ของชุดกลางหรือ globals หลังนำเข้า.
+Standards ปรับเป็น **1.7.4** พร้อม UI document **1.3.2** และ template commit `00fedda3855e7bd4c6ab419c48333bfcd0bf7e6c`. เพิ่มปุ่มกลับ CSMJU Portal ใน sidebar โดยรับ URL จาก env; คง min-w-0 ที่แก้ overflow แผนที่ไว้. ดู [provenance และข้อจำกัดส่วนกลาง](ui-template-provenance.md). ผลตรวจวันที่ 4 ตุลาคมด้านล่างเป็นหลักฐานรอบก่อน.
 
 รอบนี้แก้ Tailwind v4, next/font, tokens, shared shell/logo/buttons/badge, fields, pagination, feedback, route fallbacks, error mapping และ keyboard alternative สำหรับผัง. การตรวจ source ไม่ใช่ผลทดสอบหน้าที่ล็อกอินจริง.
 
@@ -31,7 +31,7 @@ Standards ที่ทีมกำหนดยังเป็น **1.7.0** ใ�
 | 16 Stack/API/structure | ตรวจผ่านบางส่วน | Next/Nest/Prisma/PostgreSQL, Tailwind v4, route fallbacks; 19 standards checks ผ่าน. Validation คง HTTP400 ตาม API v1.7.0 แม้ UI checklist กล่าวถึง422 — ต้องทีมกลางตัดสินความขัดแย้ง |
 | 17 Template/review/CI | ยังไม่ครบ | มี provenance และ local_components; CI source tests ไม่แทน G0–G4/PL review; shared placeholder actions ต้องแก้ upstream ตามกระบวนการ |
 | 18 Definition of Done | ยังไม่ผ่าน | ขาดผล authenticated roles, a11y/performance, เครื่องจริงและ approval; ห้ามใช้ CI สีเขียวประกาศผ่านทั้งหมด |
-| 19 ภาคผนวก | ตรวจแล้ว | ใช้เป็น reference; manifest design_system_version=1.3.1 ตามชุดที่นำเข้าจริง แยกจาก standards_version=1.7.0 |
+| 19 ภาคผนวก | ตรวจแล้ว | ใช้เป็น reference; manifest design_system_version=1.3.2 ตามชุดที่นำเข้าจริง แยกจาก standards_version=1.7.4 |
 | 20 Workflow/checklist | ยังไม่ครบ | ตรวจ source ทุกกลุ่ม; สิ่งที่ต้อง AIE ทดสอบบนเครื่องจริง/PL review ยังไม่เกิดขึ้น |
 
 ## ผลทดสอบที่ทำได้
@@ -46,7 +46,7 @@ Standards ที่ทีมกำหนดยังเป็น **1.7.0** ใ�
 
 ## Core Hub และการส่งงาน
 
-ผู้ใช้ยืนยันว่ายังไม่ได้อนุมัติเข้า Core Hub และจะยื่นเอง. จัดข้อมูลที่ตรงกับ manifest/code ไว้ใน [core-hub-registration.md](core-hub-registration.md). พอร์ต3202/4202 เป็นค่าปัจจุบัน ต้องยืนยันพอร์ตที่ทีมจัดสรรก่อนยื่น. ต้อง APPROVED/ACTIVE และมีบัญชี conformance นอก repo จึงรัน L3จริงได้. ไม่ใช้ mock identity แทนผล Core จริง.
+ผู้ใช้ยืนยันว่ายังไม่ได้อนุมัติเข้า Core Hub และจะยื่นเอง. จัดข้อมูลที่ตรงกับ manifest/code ไว้ใน [core-hub-registration.md](core-hub-registration.md). พอร์ต3216/4202 เป็นค่าปัจจุบัน ต้องยืนยันพอร์ตที่ทีมจัดสรรก่อนยื่น. ต้อง APPROVED/ACTIVE และมีบัญชี conformance นอก repo จึงรัน L3จริงได้. ไม่ใช้ mock identity แทนผล Core จริง.
 
 ไฟล์ scripts/slides/examples ที่ไม่ใช่ runtime ลบแล้วใน commitก่อน; Docker context ไม่รวม docs/standards/tests. เก็บ migrations/contracts/CI/tests ใน Git ตามหน้าที่.
 

@@ -114,7 +114,7 @@ export function InteractiveSvgMap({
 
   return (
     <div
-      className={`${cardClass} relative min-h-[390px] overflow-hidden bg-surface p-2 md:min-h-[560px]`}
+      className={`${cardClass} relative min-w-0 overflow-hidden bg-surface p-2`}
     >
       {/* Top action buttons */}
       <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
@@ -141,7 +141,7 @@ export function InteractiveSvgMap({
         viewBox={viewBox}
         role="group"
         aria-label="แผนผังสาขาวิทยาการคอมพิวเตอร์ แม่โจ้"
-        className="h-full min-h-[370px] w-full rounded-xl bg-surface transition-colors duration-200 motion-reduce:transition-none md:min-h-[540px]"
+        className="block aspect-[5/3] h-auto w-full rounded-xl bg-surface transition-colors duration-200 motion-reduce:transition-none"
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
@@ -167,30 +167,6 @@ export function InteractiveSvgMap({
               strokeWidth="0.1"
             />
           </pattern>
-          <filter
-            id="selected-shadow"
-            x="-20%"
-            y="-20%"
-            width="140%"
-            height="140%"
-          >
-            <feDropShadow
-              dx="0"
-              dy="0.35"
-              stdDeviation="0.45"
-              floodColor="var(--color-primary-container)"
-              floodOpacity="0.18"
-            />
-          </filter>
-          <filter id="room-shadow" x="-10%" y="-10%" width="120%" height="120%">
-            <feDropShadow
-              dx="0"
-              dy="0.3"
-              stdDeviation="0.4"
-              floodColor="var(--color-on-surface)"
-              floodOpacity="0.06"
-            />
-          </filter>
         </defs>
 
         {/* 1. Building Background & Architectural Base Plate */}
@@ -289,9 +265,10 @@ export function InteractiveSvgMap({
           const width = place.width ?? 12;
           const height = place.height ?? 8;
           const isSelected = selectedId === place.id;
-          const codeFontSize = Math.min(2.1, width / 5.2);
+          const code = place.roomCode ?? place.nameTh;
+          const codeFontSize = Math.min(2.1, width / 5.2, (width - 1.6) / (visibleLength(code) * 0.62));
           const nameLines = wrapPlaceName(
-            place.nameTh,
+            place.roomCode ? place.nameTh : place.description ?? categoryLabels[place.category],
             width,
             height,
             codeFontSize,
@@ -319,15 +296,16 @@ export function InteractiveSvgMap({
               key={place.id}
               role="button"
               tabIndex={0}
+              aria-pressed={isSelected}
               aria-label={`${place.roomCode ?? ""} ${place.nameTh}`}
               onClick={() => onSelect(place)}
               onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") onSelect(place);
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelect(place);
+                }
               }}
-              className="cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-container"
-              filter={
-                isSelected ? "url(#selected-shadow)" : "url(#room-shadow)"
-              }
+              className="group cursor-pointer outline-none"
             >
               {/* Room Body Box */}
               <rect
@@ -335,29 +313,16 @@ export function InteractiveSvgMap({
                 y={place.positionY}
                 width={width}
                 height={height}
-                rx="1.2"
-                fill={colors.fill}
+                rx="0.45"
+                fill={isSelected ? colors.fill : `color-mix(in srgb, ${colors.fill} 75%, var(--color-surface-container-lowest))`}
                 stroke={
-                  isSelected ? "var(--color-primary-container)" : colors.stroke
+                  isSelected
+                    ? "var(--color-primary-container)"
+                    : `color-mix(in srgb, ${colors.stroke} 35%, var(--color-outline-variant))`
                 }
-                strokeWidth={isSelected ? 0.6 : 0.45}
-                className="transition hover:brightness-95"
-              />
-
-              {/* Subtle inner floor border for architectural finish */}
-              <rect
-                x={place.positionX + 0.4}
-                y={place.positionY + 0.4}
-                width={width - 0.8}
-                height={height - 0.8}
-                rx="0.8"
-                fill="none"
-                stroke={
-                  isSelected ? "var(--color-primary-container)" : colors.stroke
-                }
-                strokeWidth="0.15"
-                opacity={isSelected ? 0.28 : 0.4}
-                pointerEvents="none"
+                strokeWidth={isSelected ? 2 : 1.2}
+                vectorEffect="non-scaling-stroke"
+                className="transition-[fill,stroke] duration-150 group-hover:stroke-primary-container group-focus-visible:stroke-primary-container group-focus-visible:[stroke-width:2] motion-reduce:transition-none"
               />
 
               {/* Room Code */}
@@ -370,7 +335,7 @@ export function InteractiveSvgMap({
                 fill="var(--color-on-surface)"
                 pointerEvents="none"
               >
-                {place.roomCode ?? place.nameTh.slice(0, 12)}
+                {code}
               </text>
 
               {/* Room Name Thai */}
@@ -397,7 +362,7 @@ export function InteractiveSvgMap({
       </svg>
 
       {/* Floating Mini Legend at Bottom Right */}
-      <div className="pointer-events-none absolute bottom-3 right-3 hidden max-w-[85%] flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-outline-variant/40 bg-white/95 px-3 py-1.5 text-caption font-medium text-on-surface-variant shadow-sm backdrop-blur md:flex">
+      <div className="pointer-events-none mt-2 flex flex-wrap items-center justify-end gap-x-3 gap-y-1 rounded-xl border border-outline-variant/40 bg-white/95 px-3 py-1.5 text-caption font-medium text-on-surface-variant">
         {activeCategories.map((cat) => (
           <span key={cat} className="flex items-center gap-1.5">
             <span

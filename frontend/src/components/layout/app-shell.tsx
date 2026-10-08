@@ -5,7 +5,6 @@ import { useShellAccessibility } from "./use-shell-accessibility";
 import {
   CsmjuAppShell,
   cardClass,
-  secondaryButtonClass,
   primaryButtonClass,
   type NavItem,
 } from "@/csmju";
@@ -52,7 +51,9 @@ const roles = {
   guest: "ผู้เยี่ยมชม",
   admin: "ผู้ดูแลระบบ",
 };
-function ShellContent({ children }: { children: React.ReactNode }) {
+type AppShellProps = { children: React.ReactNode; coreHubUrl?: string };
+
+function ShellContent({ children, coreHubUrl }: AppShellProps) {
   const root = useRef<HTMLDivElement>(null);
   useShellAccessibility(root);
   const pathname = usePathname();
@@ -71,6 +72,7 @@ function ShellContent({ children }: { children: React.ReactNode }) {
       </a>
       <CsmjuAppShell
         displayName="แผนที่ CSMJU"
+        coreHubUrl={coreHubUrl}
         nav={nav.filter(
           (item) => canManage || !["/admin", "/personnel"].includes(item.href),
         )}
@@ -79,15 +81,6 @@ function ShellContent({ children }: { children: React.ReactNode }) {
           roleLabel: user ? roles[user.coreRole] : "ยังไม่ได้เข้าสู่ระบบ",
         }}
       >
-        <a
-          href={
-            process.env.NEXT_PUBLIC_CORE_HUB_WEB_URL ??
-            "https://csmju2030.jowave.com"
-          }
-          className={`${secondaryButtonClass} inline-flex min-h-11 items-center`}
-        >
-          กลับหน้าหลัก Core Hub
-        </a>
         {loading ? (
           <LoadingState />
         ) : user || publicPage ? (
@@ -112,10 +105,10 @@ function ShellContent({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children, coreHubUrl }: AppShellProps) {
   return (
     <CurrentUserProvider>
-      <ShellContent>{children}</ShellContent>
+      <ShellContent coreHubUrl={coreHubUrl}>{children}</ShellContent>
     </CurrentUserProvider>
   );
 }

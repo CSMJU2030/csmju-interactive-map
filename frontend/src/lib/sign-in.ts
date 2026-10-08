@@ -9,7 +9,7 @@ export function renewSignIn(): void {
   const lastAttempt = Number(sessionStorage.getItem('csmju_sso_attempt') ?? 0);
   const next = window.location.pathname + window.location.search;
   if (Date.now() - lastAttempt < 60000) {
-    window.location.assign(`/signin-again?next=${encodeURIComponent(next)}`);
+    window.location.assign(new URL(`/signin-again?next=${encodeURIComponent(next)}`, window.location.origin).href);
     return;
   }
   sessionStorage.setItem('csmju_sso_attempt', String(Date.now()));

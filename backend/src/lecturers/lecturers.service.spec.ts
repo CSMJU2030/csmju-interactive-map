@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { LecturersService } from './lecturers.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { PlaceReferenceService } from '../places/place-reference.service';
-import { getFromCoreHub } from '../core-hub/core-hub-http';
+import { getFromCoreHub, CoreHubCallError } from '../core-hub/core-hub-http';
 
 jest.mock('../core-hub/core-hub-http', () => ({
   ...jest.requireActual('../core-hub/core-hub-http'),
@@ -46,5 +46,44 @@ describe('Personnel assignments', () => {
     await expect(service.create({personCode:'P-101',placeId:'room'}, 'token')).rejects.toBe(failure);
     expect(validate).toHaveBeenCalledWith('CS-101', null, 'token');
     expect(create).not.toHaveBeenCalled();
+  });
+
+  it('lists Core Hub personnel without requiring local office assignments', async () => {
+    request.mockResolvedValue({success:true,data:[person],meta:{totalPages:1}});
+    const result = await service.directory({page:1,limit:20}, 'caller-token');
+    expect(result).toMatchObject({total:1,data:[{personCode:'P-101',nameTh:'ชื่อจาก Core',personnelType:'TEACHER'}]});
+    const url = new URL(request.mock.calls[0][0]);
+    expect(Object.fromEntries(url.searchParams)).toEqual({personType:'STAFF',status:'ACTIVE',limit:'100',page:'1',departmentCode:'CS'});
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('filters across every Core page before calculating local pagination', async () => {
+    const officer = {...person,personCode:'P-102',staffType:'OFFICER'};
+    request.mockResolvedValueOnce({success:true,data:[officer],meta:{totalPages:2}})
+      .mockResolvedValueOnce({success:true,data:[person],meta:{totalPages:2}});
+    const result = await service.directory({page:1,limit:1,personnelType:'TEACHER',q:' ชื่อ '}, 'token');
+    expect(result).toMatchObject({total:1,data:[{personCode:'P-101'}]});
+    expect(new URL(request.mock.calls[1][0]).searchParams.get('page')).toBe('2');
+    expect(new URL(request.mock.calls[0][0]).searchParams.get('q')).toBe('ชื่อ');
+  });
+
+  it('reads afresh and leaves contact data absent when Core Hub does not return it', async () => {
+    request.mockResolvedValue({success:true,data:[{...person,universityEmail:undefined}],meta:{totalPages:1}});
+    await service.directory({page:1,limit:20}, 'first-user-token');
+    const result = await service.directory({page:1,limit:20}, 'second-user-token');
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(request.mock.calls[1][1]).toBe('second-user-token');
+    expect(result.data[0].email).toBeNull();
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it.each([401,403])('propagates Core Hub refusal %s rather than returning an empty directory', async status => {
+    request.mockRejectedValue(new CoreHubCallError('Refused', status));
+    await expect(service.directory({page:1,limit:20}, 'token')).rejects.toMatchObject({status});
+  });
+
+  it('rejects a malformed directory instead of silently losing later pages', async () => {
+    request.mockResolvedValue({success:true,data:[person],meta:{}});
+    await expect(service.directory({page:1,limit:20}, 'token')).rejects.toMatchObject({status:503});
   });
 });

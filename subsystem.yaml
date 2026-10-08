@@ -2,10 +2,10 @@
 # schema: standards/schemas/subsystem.schema.json
 
 name: csmju-interactive-map
-standards_version: "1.7.0"
+standards_version: "1.8.4"
 conformance_level: L3
 
-base_url: http://localhost:3202
+base_url: https://csmju-interactive-map.jowave.com
 core_hub_url: https://csmju2030.jowave.com
 core_hub_web_url: https://csmju2030.jowave.com
 callback_path: /auth/callback
@@ -41,12 +41,12 @@ repo: github.com/CSMJU2030/csmju-interactive-map
 status: proposed
 
 stack:
-  frontend: "next@15"
+  frontend: "next@16"
   backend: "nest@11"
   database: "postgresql@16"
 
 ui:
-  design_system_version: "1.3.1"
+  design_system_version: "1.3.2"
   theme: light
   nav:
     - { label: "แผนที่ Interactive", path: "/map" }

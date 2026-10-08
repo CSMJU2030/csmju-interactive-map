@@ -1,3 +1,35 @@
+## ล่าสุด: อัปเดต standards v1.8.4 — 8 ตุลาคม 2026
+
+อัปเดต .standards-version และ submodule จาก 1.7.4 เป็น 1.8.4 พร้อม Dockerfile เว็บ, Next.js standalone, .dockerignore, compose web/api และ connection pool ตามข้อกำหนดใหม่. ตรวจซ้ำด้วย Node 22.22.0: static compliance 18 scripts, OpenAPI sync, QA (lint/typecheck/build/tests 258/258), generated frontend types และ compose config ผ่าน. รวม origin/main เพื่อรับ workflow สร้าง images ของส่วนกลางและแก้ merge conflicts โดยคงฟีเจอร์ล่าสุด. ส่งผ่าน feature branch/PR #6 และตรวจ CI ของ commit ล่าสุดแยกต่างหาก; ยังไม่ได้ทดสอบ Docker runtime (Engine ไม่เปิด) หรือ conformance บน server จริง. รายละเอียดและข้อจำกัด: [standards-v184.md](docs/verification/standards-v184.md).
+
+## รายชื่อคณาจารย์และเจ้าหน้าที่จาก Core Hub — 5 ตุลาคม 2026
+
+หน้า `/personnel` ใช้ directory ของบุคลากร ACTIVE สาขา CS จาก Core Hub แทนรายการกำหนดห้องในฐานข้อมูลระบบย่อย จึงแสดงคนที่ยังไม่ได้กำหนดห้องด้วย. เพิ่ม API `/api/v1/lecturers/directory` ที่ใช้ JWT ของผู้เรียกและสิทธิ์ lecturer:read; ไม่ cache หรือบันทึกชื่อ/ข้อมูลติดต่อ. อ่านครบทุกหน้า Core ก่อนกรองประเภทและแบ่งหน้าในเว็บ; รองรับค้นหาชื่อ/รหัส. เปลี่ยนสาขาได้ด้วย PERSONNEL_DEPARTMENT_CODE.
+
+ตรวจ browser จริงล่าสุดได้ 15 คน (คณาจารย์ 10, เจ้าหน้าที่ 5), ตัวกรองและค้นหาพบหนึ่งรายการตามชื่อที่ระบุ. Anonymous API ตอบ 401; tests ครอบคลุม Core ปฏิเสธ 401/403, pagination และข้อมูลติดต่อที่ไม่ส่งกลับ. Lint/typecheck/build ผ่าน และ tests 258/258 (backend 251, frontend 7). หลักฐาน: [personnel-core-20261005.jpg](docs/verification/personnel-core-20261005.jpg).
+
+## ล่าสุด: กรอบห้องแบบมินิมอล — 5 ตุลาคม 2026
+
+ปรับ InteractiveSvgMap ตามภาพผู้ใช้: ตัด native SVG outline ที่ขยายหนาจนเป็นวงดำ, กรอบชั้นใน และ drop shadow. ใช้กรอบเดี่ยวมุมมนเล็ก เส้น 1.2px/เลือก 2px แบบ non-scaling-stroke พร้อมสี token อ่อน; keyboard focus ใช้เส้น primary 2px. ตำแหน่งและข้อมูลผังไม่เปลี่ยน. ตรวจ browser จริง LAB-3 ได้ outline=none, rect เดียว, selected stroke=2 และ non-scaling-stroke; Tab ไป LAB-4 แสดง focus primary 2px และ Space เลือกห้องได้. Frontend lint/typecheck และ git diff --check ผ่าน.
+
+ภาพยืนยัน: [map-minimal-20261005.jpg](docs/verification/map-minimal-20261005.jpg).
+
+## ล่าสุด: แผนที่กลับมาแสดงครบ — 5 ตุลาคม 2026
+
+สาเหตุที่เว็บแสดง 0 จุดพร้อม “โหลดข้อมูลไม่สำเร็จ”: PostgreSQL preview ที่ 127.0.0.1:55442 ไม่ได้รัน (`ECONNREFUSED` และ `pg_ctl status: no server running`). เปิด cluster เดิม `csmju-map-v171-audit-pg` ด้วย pg_ctl โดยไม่แก้ DATABASE_URL และไม่รัน seed/restore/migration. ตรวจ SQL แบบอ่านอย่างเดียวพบ places 14 รายการ active ครบ 14 และ map_layouts/main corridor_width 4.50. กด “ลองอีกครั้ง” ในหน้า localhost:3216/map แล้วแสดงครบ 14 จุด รวม LABCOM-5 และ LAB-NETWORK; ไม่มีข้อความโหลดล้มเหลว. เพิ่มขั้นเปิดฐานข้อมูลเดิมใน README เพราะ pnpm dev เปิดแค่ frontend/backend.
+
+ภาพยืนยัน: [map-restored-20261005.jpg](docs/verification/map-restored-20261005.jpg).
+
+## ล่าสุด: อัปเดต standards v1.7.4 — 5 ตุลาคม 2026
+
+อัปเดต `.standards-version` และ submodule เป็น v1.7.4 (`00fedda3855e7bd4c6ab419c48333bfcd0bf7e6c`), manifest ใช้ UI 1.3.2, Next.js/eslint-config-next 16.3.6 และ lockfile ใหม่. เพิ่มปุ่ม “กลับ CSMJU Portal” ใน sidebar จาก env; คง min-w-0 แก้ overflow เดิม. สีหมวดหมู่แผนที่ปรับเป็น token กลาง และปรับการอ่าน browser URL/รีเซ็ต state ให้ผ่านกฎ React ของ Next.js 16.
+
+เพิ่มเติม: Core Hub ส่ง callback มาที่ frontend http://localhost:3216 จึงปรับ dev/start, manifest, CORS และคู่มือจาก 3202 เป็น 3216; backend ยังใช้ 4202. ตรวจผ่าน proxy: health 200, login 302 ไป Core Hub พร้อม state cookie, callback ที่ไม่มี token ตอบ 400. เปิดขั้นตอน login ใหม่ให้ผู้ใช้; ยังไม่ได้ยืนยันผล authenticated session หรือ L3.
+
+ผล Node 22: lint/typecheck/build ผ่าน, tests **252/252**, OpenAPI sync และ UI-01 ผ่าน. Standards orchestrator ผ่าน 18/19; GH-04 ผ่านเมื่อตรวจซ้ำหลัง local commit `b1dc1c9` เฉพาะไฟล์เวอร์ชันกับ gitlink จึงมีผลตรวจ PASS ครบทั้ง 19 ข้อ. รายละเอียด: [standards-v174.md](docs/verification/standards-v174.md).
+
+**ยังไม่รับรอง GitHub CI, conformance L1–L3 หรือ production ของชุดนี้.** ยังไม่มีบัญชี conformance/ทะเบียนที่เปิดใช้งานยืนยันได้; ข้อจำกัด full UI audit เดิมยังอยู่. Commit ยังไม่ได้ push และโค้ด/เอกสารรอบนี้ยังอยู่ใน working tree ให้ review. ข้อมูลด้านล่างเป็นประวัติรอบก่อน.
+
 ## ล่าสุด: นำชุด UI กลางเข้าเว็บและเตรียมลงทะเบียน — 4 ตุลาคม 2026
 
 **ยังไม่ผ่านทุกข้อ / ยังไม่พร้อม merge หรือ production.** นำ shared template UI1.3.1 จาก standards main เข้าโดยคง standards1.7.0 ตามทีมสั่ง; ไม่แก้ source กลาง. แก้ Tailwindv4/next-font/shell/logo/forms/pagination/feedback/focusและkeyboardalternative แล้ว. ดู [audit รายหมวด0–20](docs/ui-design-system-audit.md) และ [provenance/ปัญหาที่ต้องแก้ส่วนกลาง](docs/ui-template-provenance.md).
@@ -83,3 +115,6 @@ L3 ผ่าน 71 PASS / 0 FAIL / 0 SKIP; Core build/typecheck/lint และ u
 ## Checkout สำหรับส่ง PR
 
 โฟลเดอร์ csmju-interactive-map-publish clone จาก main 4282bd51ce75fb246c27b20bb6751faab8df918c และใช้ branch feature/interactive-map/compliance-fixes; นำ source/generated contracts/tests/report เข้ามาและเก็บ .github จาก upstream. standards gitlink ปรับเป็น v1.7.0 ตาม upstream main; ผล secret scan ของรอบก่อนผ่าน. ส่งงานผ่าน feature branch เพื่อเปิด PR; ผล GitHub CI และ conformance บน server จริงต้องตรวจเพิ่มเติมก่อน merge/deploy.
+## URL production ที่ยืนยัน — 8 ตุลาคม 2026
+
+ผู้ใช้ยืนยัน Base URL `https://csmju-interactive-map.jowave.com` และ Callback `https://csmju-interactive-map.jowave.com/auth/callback`. ปรับ subsystem.yaml และคู่มือให้ตรงกัน พร้อมแก้ standards_version ใน manifest เป็น 1.8.4 ให้ตรงกับ .standards-version. ตรวจ HTTP โดยไม่ส่งบัญชีหรือ token พบว่า `/`, `/api/health`, `/auth/login` และ `/auth/callback` ตอบ 503 Service Unavailable จาก Apache; ยังไม่ได้แก้หรือยืนยันสถานะ services/reverse proxy/ทะเบียนบน server. เว็บ local ยังคงรันที่ localhost:3216.

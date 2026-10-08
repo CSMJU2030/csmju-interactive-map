@@ -4,6 +4,7 @@ export default () => {
     nodeEnv: process.env.NODE_ENV ?? 'development',
     port: Number(process.env.PORT ?? 4202),
     subsystemId: process.env.SUBSYSTEM_ID ?? 'csmju-interactive-map',
+    personnelDepartmentCode: process.env.PERSONNEL_DEPARTMENT_CODE ?? 'CS',
     coreHub: {
       url,
       webUrl: (process.env.CORE_HUB_WEB_URL ?? url).replace(/\/+$/, ''),

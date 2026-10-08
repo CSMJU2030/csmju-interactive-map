@@ -100,7 +100,9 @@ export function PlaceForm({
   }, []);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
+  const [sourcePlace, setSourcePlace] = useState<Place | null | undefined>(undefined);
+  if (sourcePlace !== place) {
+    setSourcePlace(place);
     setValues(
       place
         ? {
@@ -118,7 +120,7 @@ export function PlaceForm({
         : defaults,
     );
     setErrors({});
-  }, [place]);
+  }
 
   const validateField = (key: keyof PlaceFormValues) => {
     const parsed = placeSchema.shape[key].safeParse(values[key]);

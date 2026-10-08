@@ -55,7 +55,7 @@ export async function bootstrap(): Promise<void> {
   );
   app.enableCors({
     origin: config
-      .get<string>("CORS_ORIGIN", "http://localhost:3202")
+      .get<string>("CORS_ORIGIN", "http://localhost:3216")
       .split(","),
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true,

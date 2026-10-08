@@ -1,4 +1,4 @@
-import { ApiResult, LecturerResponseDto, DeletedRecordDto, CorePersonOptionDto } from '../contracts/map-contract.dto';
+import { ApiResult, LecturerResponseDto, DeletedRecordDto, CorePersonOptionDto, PersonnelDirectoryDto } from '../contracts/map-contract.dto';
 import {
   Body,
   Controller,
@@ -58,6 +58,16 @@ export class LecturersController {
   async corePeople(@Query() query: LecturerListQueryDto, @CoreHubAccessToken() token: string) {
     const result = await this.lecturers.availablePeople(query,token);
     return paginated(result.data,query.page,query.limit,result.total);
+  }
+
+  @Get('directory')
+  @ApiResult(PersonnelDirectoryDto, true)
+  @Header('Cache-Control', 'no-store')
+  @RequirePermissions(Permission.LECTURER_READ)
+  @ApiOperation({ summary: 'Read the active department personnel directory from Core Hub' })
+  async directory(@Query() query: LecturerListQueryDto, @CoreHubAccessToken() token: string) {
+    const result = await this.lecturers.directory(query, token);
+    return paginated(result.data, query.page, query.limit, result.total);
   }
 
   @Post()

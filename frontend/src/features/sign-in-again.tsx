@@ -1,19 +1,15 @@
 "use client";
 import { cardClass, primaryButtonClass } from "@/csmju";
-import { useEffect, useState } from "react";
+import { useBrowserLocation } from "@/lib/browser-location";
 import { loginHref } from "@/lib/sign-in";
 
 export default function SignInAgain() {
-  const [next, setNext] = useState("/map");
-  useEffect(() => {
-    const value = new URLSearchParams(window.location.search).get("next");
-    if (
-      value?.startsWith("/") &&
-      !value.startsWith("//") &&
-      !value.startsWith("/auth/")
-    )
-      setNext(value);
-  }, []);
+  const location = useBrowserLocation();
+  const value = location ? new URL(location).searchParams.get("next") : null;
+  const next =
+    value?.startsWith("/") && !value.startsWith("//") && !value.startsWith("/auth/")
+      ? value
+      : "/map";
   return (
     <section
       className={`${cardClass} mx-auto max-w-xl space-y-4 p-6`}
