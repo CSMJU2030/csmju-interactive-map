@@ -34,6 +34,7 @@ import type {
 import { BulkLayoutEditor } from "./bulk-layout-editor";
 import { LecturerManager } from "./lecturer-manager";
 import { PlaceForm } from "./place-form";
+import { TeachingScheduleManager } from "./teaching-schedule-manager";
 
 export function AdminDashboard() {
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -312,18 +313,6 @@ export function AdminDashboard() {
         <Pagination page={page} totalPages={totalPages} onChange={setPage} />
       </section>
 
-      {user && (
-        <LecturerManager places={layoutPlaces} userRole={user.subsystemRole} />
-      )}
-
-      <section id="settings" className={`${cardClass} p-5`}>
-        <h2 className="font-bold text-on-surface">การตั้งค่า Integration</h2>
-        <p className="mt-1 text-label-md text-on-surface-variant">
-          สิทธิ์มาจากบัญชี Core Hub เจ้าหน้าที่แก้ไขแผนที่ได้
-          และผู้ดูแลลบรายการได้
-        </p>
-      </section>
-
       {editing !== undefined && (
         <PlaceForm
           place={editing}
@@ -342,6 +331,20 @@ export function AdminDashboard() {
           }}
         />
       )}
+
+      <TeachingScheduleManager places={layoutPlaces} onSaved={load} />
+
+      {user && (
+        <LecturerManager places={layoutPlaces} userRole={user.subsystemRole} />
+      )}
+
+      <section id="settings" className={`${cardClass} p-5`}>
+        <h2 className="font-bold text-on-surface">การตั้งค่า Integration</h2>
+        <p className="mt-1 text-label-md text-on-surface-variant">
+          สิทธิ์มาจากบัญชี Core Hub เจ้าหน้าที่แก้ไขแผนที่ได้
+          และผู้ดูแลลบรายการได้
+        </p>
+      </section>
 
       {deletingPlace && (
         <DeleteDialog

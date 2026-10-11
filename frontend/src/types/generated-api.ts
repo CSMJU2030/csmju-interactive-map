@@ -171,14 +171,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/places/core-rooms": {
+    "/api/v1/places/registrar-timetable": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["PlacesController_coreRooms"];
+        get: operations["PlacesController_registrarTimetable"];
         put?: never;
         post?: never;
         delete?: never;
@@ -257,14 +257,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/lecturers/core-people": {
+    "/api/v1/lecturers/directory": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["LecturersController_corePeople"];
+        /** Read the locally managed personnel directory */
+        get: operations["LecturersController_directory"];
         put?: never;
         post?: never;
         delete?: never;
@@ -273,17 +274,17 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/lecturers/directory": {
+    "/api/v1/lecturers/import-csmju": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Read the active department personnel directory from Core Hub */
-        get: operations["LecturersController_directory"];
+        get?: never;
         put?: never;
-        post?: never;
+        /** Import current public personnel from the CSMJU department website */
+        post: operations["LecturersController_importCsmju"];
         delete?: never;
         options?: never;
         head?: never;
@@ -310,6 +311,17 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        TeachingSessionResponseDto: {
+            id: string;
+            lecturerId: string;
+            lecturerName: string;
+            dayOfWeek: number;
+            startTime: string;
+            endTime: string;
+            validFrom: string;
+            validUntil: string;
+            courseName: string;
+        };
         LecturerSummaryDto: {
             id: string;
             personCode: string;
@@ -320,6 +332,7 @@ export interface components {
             personnelType: "TEACHER" | "STAFF";
         };
         PlaceResponseDto: {
+            teachingSchedule: components["schemas"]["TeachingSessionResponseDto"][];
             id: string;
             roomCode: string | null;
             nameTh: string;
@@ -377,16 +390,35 @@ export interface components {
             corridorPoints: components["schemas"]["MapPointDto"][];
             corridorWidth: number;
         };
-        CoreRoomDto: {
-            code: string;
-            nameTh: string;
-            isActive: boolean;
-            updatedAt: string;
+        RegistrarSessionDto: {
+            courseCode: string;
+            courseName: string;
+            section: string;
+            lecturerNames: string[];
+            roomName: string;
+            dayOfWeek: number;
+            startTime: string;
+            endTime: string;
+        };
+        TeachingSessionInputDto: {
+            /** Format: uuid */
+            lecturerId: string;
+            dayOfWeek: number;
+            /** @example 09:00 */
+            startTime: string;
+            /** @example 12:00 */
+            endTime: string;
+            /** @example 2026-06-01 */
+            validFrom: string;
+            /** @example 2026-10-31 */
+            validUntil: string;
+            courseName: string;
         };
         CreatePlaceDto: {
+            teachingSchedule?: components["schemas"]["TeachingSessionInputDto"][];
             /** @example LAB-03 */
             roomCode?: string;
-            /** @description ชื่อจุดบนแผนที่ที่ไม่ใช่ห้องของ Core Hub */
+            /** @description ชื่อห้องหรือสถานที่ที่แก้ไขได้ในระบบ */
             nameTh?: string;
             description?: string;
             /** @enum {string} */
@@ -426,9 +458,10 @@ export interface components {
             corridor?: components["schemas"]["UpdateCorridorDto"];
         };
         UpdatePlaceDto: {
+            teachingSchedule?: components["schemas"]["TeachingSessionInputDto"][];
             /** @example LAB-03 */
             roomCode?: string;
-            /** @description ชื่อจุดบนแผนที่ที่ไม่ใช่ห้องของ Core Hub */
+            /** @description ชื่อห้องหรือสถานที่ที่แก้ไขได้ในระบบ */
             nameTh?: string;
             description?: string;
             /** @enum {string} */
@@ -459,6 +492,18 @@ export interface components {
             positionY: number;
             isActive: boolean;
         };
+        PersonnelTeachingDto: {
+            id: string;
+            lecturerId: string;
+            lecturerName: string;
+            dayOfWeek: number;
+            startTime: string;
+            endTime: string;
+            validFrom: string;
+            validUntil: string;
+            courseName: string;
+            place: components["schemas"]["AssignmentPlaceDto"];
+        };
         LecturerResponseDto: {
             id: string;
             personCode: string;
@@ -467,11 +512,13 @@ export interface components {
             email: string | null;
             /** @enum {string} */
             personnelType: "TEACHER" | "STAFF";
+            teachingSchedule: components["schemas"]["PersonnelTeachingDto"][];
             sourceId: number | null;
             title: string | null;
             positionAcademic: string | null;
             positionManager: string | null;
             imageProfile: string | null;
+            sourceUrl: string | null;
             phone: string | null;
             education: string | null;
             academicType: string | null;
@@ -482,11 +529,6 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
-        CorePersonOptionDto: {
-            personCode: string;
-            nameTh: string;
-            personnelType: string;
-        };
         PersonnelDirectoryDto: {
             personCode: string;
             nameTh: string;
@@ -494,18 +536,44 @@ export interface components {
             email: string | null;
             /** @enum {string} */
             personnelType: "TEACHER" | "STAFF";
+            teachingSchedule: components["schemas"]["PersonnelTeachingDto"][];
             positionAcademic: string | null;
             positionManager: string | null;
+            imageProfile: string | null;
+            sourceUrl: string | null;
+            phone: string | null;
+            education: string | null;
+            place: components["schemas"]["AssignmentPlaceDto"] | null;
+        };
+        PersonnelImportResultDto: {
+            created: number;
+            updated: number;
+            skipped: string[];
+            sourceUrl: string;
         };
         CreateLecturerDto: {
-            /** @description personCode จาก Core Hub */
+            /** @description รหัสบุคลากรที่ผู้ดูแลกำหนด */
             personCode: string;
+            nameTh: string;
+            nameEn?: string | null;
+            /** @enum {string} */
+            personnelType?: "TEACHER" | "STAFF";
+            email?: string | null;
+            positionAcademic?: string | null;
+            positionManager?: string | null;
             /** Format: uuid */
             placeId?: string | null;
         };
         UpdateLecturerDto: {
-            /** @description personCode จาก Core Hub */
+            /** @description รหัสบุคลากรที่ผู้ดูแลกำหนด */
             personCode?: string;
+            nameTh?: string;
+            nameEn?: string | null;
+            /** @enum {string} */
+            personnelType?: "TEACHER" | "STAFF";
+            email?: string | null;
+            positionAcademic?: string | null;
+            positionManager?: string | null;
             /** Format: uuid */
             placeId?: string | null;
         };
@@ -787,11 +855,11 @@ export interface operations {
             };
         };
     };
-    PlacesController_coreRooms: {
+    PlacesController_registrarTimetable: {
         parameters: {
-            query?: {
-                page?: components["schemas"]["Object"];
-                limit?: components["schemas"]["Object"];
+            query: {
+                academicYear: number;
+                semester: number;
             };
             header?: never;
             path?: never;
@@ -807,7 +875,7 @@ export interface operations {
                     "application/json": {
                         /** @enum {boolean} */
                         success: true;
-                        data: components["schemas"]["CoreRoomDto"][];
+                        data: components["schemas"]["RegistrarSessionDto"][];
                         meta: components["schemas"]["PaginationMetaDto"];
                     };
                 };
@@ -1005,35 +1073,6 @@ export interface operations {
             };
         };
     };
-    LecturersController_corePeople: {
-        parameters: {
-            query?: {
-                page?: components["schemas"]["Object"];
-                limit?: components["schemas"]["Object"];
-                q?: string;
-                personnelType?: "TEACHER" | "STAFF";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: true;
-                        data: components["schemas"]["CorePersonOptionDto"][];
-                        meta: components["schemas"]["PaginationMetaDto"];
-                    };
-                };
-            };
-        };
-    };
     LecturersController_directory: {
         parameters: {
             query?: {
@@ -1058,6 +1097,29 @@ export interface operations {
                         success: true;
                         data: components["schemas"]["PersonnelDirectoryDto"][];
                         meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    LecturersController_importCsmju: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {boolean} */
+                        success: true;
+                        data: components["schemas"]["PersonnelImportResultDto"];
                     };
                 };
             };

@@ -1,2 +1,6 @@
-// Auth e2e does not require business data or a database connection.
-export class InMemoryPrisma { reset(): void {} }
+// Only the authenticated list route used by SSO tests needs local business data.
+export class InMemoryPrisma {
+  place = { findMany: () => Promise.resolve([]), count: () => Promise.resolve(0) };
+  $transaction(items: Promise<unknown>[]) { return Promise.all(items); }
+  reset(): void {}
+}

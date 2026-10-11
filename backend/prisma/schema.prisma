@@ -45,6 +45,7 @@ model Place {
   createdAt   DateTime        @default(now()) @map("created_at")
   updatedAt   DateTime        @updatedAt @map("updated_at")
   lecturers   Lecturer[]
+  teachingSchedule TeachingSession[]
   keywords    SearchKeyword[]
 
   @@index([category, isActive])
@@ -54,6 +55,17 @@ model Place {
 model Lecturer {
   id                String        @id @default(uuid()) @db.Uuid
   personCode        String        @unique @map("person_code")
+  nameTh            String        @map("name_th")
+  nameEn            String?       @map("name_en")
+  personnelType     PersonnelType @default(TEACHER) @map("personnel_type")
+  email             String?
+  positionAcademic  String?       @map("position_academic")
+  positionManager   String?       @map("position_manager")
+  sourcePersonnelId String?       @unique @map("source_personnel_id")
+  imageProfile      String?       @map("image_profile")
+  phone             String?
+  education         String?
+  teachingSchedule TeachingSession[]
   coreUserId        String?       @map("core_user_id") @db.VarChar(64)
   placeId           String?       @map("place_id") @db.Uuid
   createdAt         DateTime      @default(now()) @map("created_at")
@@ -63,6 +75,23 @@ model Lecturer {
   @@index([placeId])
   @@index([coreUserId])
   @@map("personnel_assignments")
+}
+
+model TeachingSession {
+  id String @id @default(uuid()) @db.Uuid
+  placeId String @map("place_id") @db.Uuid
+  lecturerId String @map("lecturer_id") @db.Uuid
+  dayOfWeek Int @map("day_of_week")
+  startTime String @map("start_time") @db.VarChar(5)
+  endTime String @map("end_time") @db.VarChar(5)
+  validFrom String @map("valid_from") @db.VarChar(10)
+  validUntil String @map("valid_until") @db.VarChar(10)
+  courseName String @map("course_name")
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  lecturer Lecturer @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
+  @@index([placeId])
+  @@index([lecturerId, dayOfWeek])
+  @@map("teaching_sessions")
 }
 
 model SearchKeyword {

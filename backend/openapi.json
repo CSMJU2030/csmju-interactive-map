@@ -197,11 +197,7 @@
             }
           }
         },
-        "security": [
-          {
-            "core-hub-bearer": []
-          }
-        ],
+        "security": [],
         "summary": "List and optionally filter places",
         "tags": [
           "places"
@@ -338,11 +334,7 @@
             }
           }
         },
-        "security": [
-          {
-            "core-hub-bearer": []
-          }
-        ],
+        "security": [],
         "summary": "Search places by room, keyword, or lecturer",
         "tags": [
           "places"
@@ -537,48 +529,33 @@
             }
           }
         },
-        "security": [
-          {
-            "core-hub-bearer": []
-          }
-        ],
+        "security": [],
         "summary": "Return the editable map corridor layout",
         "tags": [
           "places"
         ]
       }
     },
-    "/api/v1/places/core-rooms": {
+    "/api/v1/places/registrar-timetable": {
       "get": {
-        "operationId": "PlacesController_coreRooms",
+        "operationId": "PlacesController_registrarTimetable",
         "parameters": [
           {
-            "name": "page",
-            "required": false,
+            "name": "academicYear",
+            "required": true,
             "in": "query",
             "schema": {
-              "minimum": 1,
-              "default": 1,
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Object"
-                }
-              ]
+              "example": 2569,
+              "type": "number"
             }
           },
           {
-            "name": "limit",
-            "required": false,
+            "name": "semester",
+            "required": true,
             "in": "query",
             "schema": {
-              "minimum": 1,
-              "maximum": 100,
-              "default": 20,
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Object"
-                }
-              ]
+              "example": 1,
+              "type": "number"
             }
           }
         ],
@@ -604,7 +581,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/CoreRoomDto"
+                        "$ref": "#/components/schemas/RegistrarSessionDto"
                       }
                     },
                     "meta": {
@@ -666,11 +643,7 @@
             }
           }
         },
-        "security": [
-          {
-            "core-hub-bearer": []
-          }
-        ],
+        "security": [],
         "summary": "Get a place by UUID",
         "tags": [
           "places"
@@ -1096,104 +1069,6 @@
         ]
       }
     },
-    "/api/v1/lecturers/core-people": {
-      "get": {
-        "operationId": "LecturersController_corePeople",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "default": 1,
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Object"
-                }
-              ]
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "minimum": 1,
-              "maximum": 100,
-              "default": 20,
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Object"
-                }
-              ]
-            }
-          },
-          {
-            "name": "q",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "personnelType",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "TEACHER",
-                "STAFF"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "success",
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/CorePersonOptionDto"
-                      }
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/PaginationMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "core-hub-bearer": []
-          }
-        ],
-        "tags": [
-          "lecturers"
-        ]
-      }
-    },
     "/api/v1/lecturers/directory": {
       "get": {
         "operationId": "LecturersController_directory",
@@ -1282,12 +1157,50 @@
             }
           }
         },
+        "security": [],
+        "summary": "Read the locally managed personnel directory",
+        "tags": [
+          "lecturers"
+        ]
+      }
+    },
+    "/api/v1/lecturers/import-csmju": {
+      "post": {
+        "operationId": "LecturersController_importCsmju",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PersonnelImportResultDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "security": [
           {
             "core-hub-bearer": []
           }
         ],
-        "summary": "Read the active department personnel directory from Core Hub",
+        "summary": "Import current public personnel from the CSMJU department website",
         "tags": [
           "lecturers"
         ]
@@ -1430,6 +1343,49 @@
       }
     },
     "schemas": {
+      "TeachingSessionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "lecturerId": {
+            "type": "string"
+          },
+          "lecturerName": {
+            "type": "string"
+          },
+          "dayOfWeek": {
+            "type": "number"
+          },
+          "startTime": {
+            "type": "string"
+          },
+          "endTime": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string"
+          },
+          "validUntil": {
+            "type": "string"
+          },
+          "courseName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "lecturerId",
+          "lecturerName",
+          "dayOfWeek",
+          "startTime",
+          "endTime",
+          "validFrom",
+          "validUntil",
+          "courseName"
+        ]
+      },
       "LecturerSummaryDto": {
         "type": "object",
         "properties": {
@@ -1470,6 +1426,12 @@
       "PlaceResponseDto": {
         "type": "object",
         "properties": {
+          "teachingSchedule": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeachingSessionResponseDto"
+            }
+          },
           "id": {
             "type": "string"
           },
@@ -1543,6 +1505,7 @@
           }
         },
         "required": [
+          "teachingSchedule",
           "id",
           "roomCode",
           "nameTh",
@@ -1704,39 +1667,106 @@
           "corridorWidth"
         ]
       },
-      "CoreRoomDto": {
+      "RegistrarSessionDto": {
         "type": "object",
         "properties": {
-          "code": {
+          "courseCode": {
             "type": "string"
           },
-          "nameTh": {
+          "courseName": {
             "type": "string"
           },
-          "isActive": {
-            "type": "boolean"
+          "section": {
+            "type": "string"
           },
-          "updatedAt": {
+          "lecturerNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "roomName": {
+            "type": "string"
+          },
+          "dayOfWeek": {
+            "type": "number"
+          },
+          "startTime": {
+            "type": "string"
+          },
+          "endTime": {
             "type": "string"
           }
         },
         "required": [
-          "code",
-          "nameTh",
-          "isActive",
-          "updatedAt"
+          "courseCode",
+          "courseName",
+          "section",
+          "lecturerNames",
+          "roomName",
+          "dayOfWeek",
+          "startTime",
+          "endTime"
+        ]
+      },
+      "TeachingSessionInputDto": {
+        "type": "object",
+        "properties": {
+          "lecturerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "dayOfWeek": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "startTime": {
+            "type": "string",
+            "example": "09:00"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "12:00"
+          },
+          "validFrom": {
+            "type": "string",
+            "example": "2026-06-01"
+          },
+          "validUntil": {
+            "type": "string",
+            "example": "2026-10-31"
+          },
+          "courseName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "lecturerId",
+          "dayOfWeek",
+          "startTime",
+          "endTime",
+          "validFrom",
+          "validUntil",
+          "courseName"
         ]
       },
       "CreatePlaceDto": {
         "type": "object",
         "properties": {
+          "teachingSchedule": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeachingSessionInputDto"
+            }
+          },
           "roomCode": {
             "type": "string",
             "example": "LAB-03"
           },
           "nameTh": {
             "type": "string",
-            "description": "ชื่อจุดบนแผนที่ที่ไม่ใช่ห้องของ Core Hub"
+            "description": "ชื่อห้องหรือสถานที่ที่แก้ไขได้ในระบบ"
           },
           "description": {
             "type": "string"
@@ -1909,13 +1939,19 @@
       "UpdatePlaceDto": {
         "type": "object",
         "properties": {
+          "teachingSchedule": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeachingSessionInputDto"
+            }
+          },
           "roomCode": {
             "type": "string",
             "example": "LAB-03"
           },
           "nameTh": {
             "type": "string",
-            "description": "ชื่อจุดบนแผนที่ที่ไม่ใช่ห้องของ Core Hub"
+            "description": "ชื่อห้องหรือสถานที่ที่แก้ไขได้ในระบบ"
           },
           "description": {
             "type": "string"
@@ -2043,6 +2079,53 @@
           "isActive"
         ]
       },
+      "PersonnelTeachingDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "lecturerId": {
+            "type": "string"
+          },
+          "lecturerName": {
+            "type": "string"
+          },
+          "dayOfWeek": {
+            "type": "number"
+          },
+          "startTime": {
+            "type": "string"
+          },
+          "endTime": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string"
+          },
+          "validUntil": {
+            "type": "string"
+          },
+          "courseName": {
+            "type": "string"
+          },
+          "place": {
+            "$ref": "#/components/schemas/AssignmentPlaceDto"
+          }
+        },
+        "required": [
+          "id",
+          "lecturerId",
+          "lecturerName",
+          "dayOfWeek",
+          "startTime",
+          "endTime",
+          "validFrom",
+          "validUntil",
+          "courseName",
+          "place"
+        ]
+      },
       "LecturerResponseDto": {
         "type": "object",
         "properties": {
@@ -2070,6 +2153,12 @@
               "STAFF"
             ]
           },
+          "teachingSchedule": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonnelTeachingDto"
+            }
+          },
           "sourceId": {
             "type": "number",
             "nullable": true
@@ -2087,6 +2176,10 @@
             "nullable": true
           },
           "imageProfile": {
+            "type": "string",
+            "nullable": true
+          },
+          "sourceUrl": {
             "type": "string",
             "nullable": true
           },
@@ -2131,11 +2224,13 @@
           "nameEn",
           "email",
           "personnelType",
+          "teachingSchedule",
           "sourceId",
           "title",
           "positionAcademic",
           "positionManager",
           "imageProfile",
+          "sourceUrl",
           "phone",
           "education",
           "academicType",
@@ -2143,25 +2238,6 @@
           "place",
           "createdAt",
           "updatedAt"
-        ]
-      },
-      "CorePersonOptionDto": {
-        "type": "object",
-        "properties": {
-          "personCode": {
-            "type": "string"
-          },
-          "nameTh": {
-            "type": "string"
-          },
-          "personnelType": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "personCode",
-          "nameTh",
-          "personnelType"
         ]
       },
       "PersonnelDirectoryDto": {
@@ -2188,6 +2264,12 @@
               "STAFF"
             ]
           },
+          "teachingSchedule": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonnelTeachingDto"
+            }
+          },
           "positionAcademic": {
             "type": "string",
             "nullable": true
@@ -2195,6 +2277,31 @@
           "positionManager": {
             "type": "string",
             "nullable": true
+          },
+          "imageProfile": {
+            "type": "string",
+            "nullable": true
+          },
+          "sourceUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "education": {
+            "type": "string",
+            "nullable": true
+          },
+          "place": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AssignmentPlaceDto"
+              }
+            ]
           }
         },
         "required": [
@@ -2203,8 +2310,40 @@
           "nameEn",
           "email",
           "personnelType",
+          "teachingSchedule",
           "positionAcademic",
-          "positionManager"
+          "positionManager",
+          "imageProfile",
+          "sourceUrl",
+          "phone",
+          "education",
+          "place"
+        ]
+      },
+      "PersonnelImportResultDto": {
+        "type": "object",
+        "properties": {
+          "created": {
+            "type": "number"
+          },
+          "updated": {
+            "type": "number"
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sourceUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "created",
+          "updated",
+          "skipped",
+          "sourceUrl"
         ]
       },
       "CreateLecturerDto": {
@@ -2212,7 +2351,33 @@
         "properties": {
           "personCode": {
             "type": "string",
-            "description": "personCode จาก Core Hub"
+            "description": "รหัสบุคลากรที่ผู้ดูแลกำหนด"
+          },
+          "nameTh": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "personnelType": {
+            "type": "string",
+            "enum": [
+              "TEACHER",
+              "STAFF"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionAcademic": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionManager": {
+            "type": "string",
+            "nullable": true
           },
           "placeId": {
             "type": "string",
@@ -2221,7 +2386,8 @@
           }
         },
         "required": [
-          "personCode"
+          "personCode",
+          "nameTh"
         ]
       },
       "UpdateLecturerDto": {
@@ -2229,7 +2395,33 @@
         "properties": {
           "personCode": {
             "type": "string",
-            "description": "personCode จาก Core Hub"
+            "description": "รหัสบุคลากรที่ผู้ดูแลกำหนด"
+          },
+          "nameTh": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "personnelType": {
+            "type": "string",
+            "enum": [
+              "TEACHER",
+              "STAFF"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionAcademic": {
+            "type": "string",
+            "nullable": true
+          },
+          "positionManager": {
+            "type": "string",
+            "nullable": true
           },
           "placeId": {
             "type": "string",

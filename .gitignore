@@ -7,6 +7,11 @@ coverage/
 .env
 .env.local
 .env.*.local
+.env.*
+!.env.*.example
+backend.env
+frontend.env
+*-production-env.zip
 !.env.example
 frontend/.env
 backend/.env

@@ -18,7 +18,19 @@ export class LecturerSummaryDto {
   @ApiProperty({type:String,nullable:true}) email!: string | null;
   @ApiProperty({enum:['TEACHER','STAFF']}) personnelType!: 'TEACHER' | 'STAFF';
 }
+export class TeachingSessionResponseDto {
+  @ApiProperty() id!: string;
+  @ApiProperty() lecturerId!: string;
+  @ApiProperty() lecturerName!: string;
+  @ApiProperty() dayOfWeek!: number;
+  @ApiProperty() startTime!: string;
+  @ApiProperty() endTime!: string;
+  @ApiProperty() validFrom!: string;
+  @ApiProperty() validUntil!: string;
+  @ApiProperty() courseName!: string;
+}
 export class PlaceResponseDto {
+  @ApiProperty({type:[TeachingSessionResponseDto]}) teachingSchedule!: TeachingSessionResponseDto[];
   @ApiProperty() id!: string;
   @ApiProperty({type:String,nullable:true}) roomCode!: string | null;
   @ApiProperty() nameTh!: string;
@@ -36,12 +48,17 @@ export class PlaceResponseDto {
   @ApiProperty({format:'date-time'}) updatedAt!: string;
 }
 export class AssignmentPlaceDto extends PickType(PlaceResponseDto, ['id', 'roomCode', 'nameTh', 'nameEn', 'category', 'positionX', 'positionY', 'isActive'] as const) {}
+export class PersonnelTeachingDto extends TeachingSessionResponseDto {
+  @ApiProperty({type:AssignmentPlaceDto}) place!: AssignmentPlaceDto;
+}
 export class LecturerResponseDto extends LecturerSummaryDto {
+  @ApiProperty({type:[PersonnelTeachingDto]}) teachingSchedule!: PersonnelTeachingDto[];
   @ApiProperty({type:Number,nullable:true}) sourceId!: number | null;
   @ApiProperty({type:String,nullable:true}) title!: string | null;
   @ApiProperty({type:String,nullable:true}) positionAcademic!: string | null;
   @ApiProperty({type:String,nullable:true}) positionManager!: string | null;
   @ApiProperty({type:String,nullable:true}) imageProfile!: string | null;
+  @ApiProperty({type:String,nullable:true}) sourceUrl!: string | null;
   @ApiProperty({type:String,nullable:true}) phone!: string | null;
   @ApiProperty({type:String,nullable:true}) education!: string | null;
   @ApiProperty({type:String,nullable:true}) academicType!: string | null;
@@ -53,7 +70,14 @@ export class LecturerResponseDto extends LecturerSummaryDto {
 export class PersonnelDirectoryDto extends PickType(LecturerResponseDto, [
   'personCode', 'nameTh', 'nameEn', 'personnelType',
   'positionAcademic', 'positionManager', 'email',
+  'place', 'teachingSchedule', 'imageProfile', 'sourceUrl', 'phone', 'education',
 ] as const) {}
+export class PersonnelImportResultDto {
+  @ApiProperty() created!: number;
+  @ApiProperty() updated!: number;
+  @ApiProperty({type:[String]}) skipped!: string[];
+  @ApiProperty() sourceUrl!: string;
+}
 
 export class SessionDto {
   @ApiProperty({type:String,nullable:true,format:'date-time'}) expiresAt!: string | null;

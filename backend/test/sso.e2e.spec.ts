@@ -518,16 +518,16 @@ describe('Central SSO 1.1 (e2e)', () => {
 
   // ------------------------------------------------- the cookie session --
   describe('the session cookie on the API', () => {
-    it('reaches a business API, whose Core Hub calls carry the same token', async () => {
+    it('reaches the locally managed business API with a verified session', async () => {
       const signedIn = await signIn(studentToken);
 
       const response = await request(server())
-        .get('/api/v1/places/core-rooms?limit=100')
+        .get('/api/v1/places?limit=100')
         .set('Cookie', pair(cookieNamed(signedIn, SESSION_COOKIE)))
         .expect(200);
 
-      expect(response.body.data).toHaveLength(1);
-      expect(coreHub.lastRoomsAuthorization).toBe(`Bearer ${studentToken}`);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(coreHub.lastRoomsAuthorization).toBeUndefined();
     });
 
     it('still enforces subsystem authorization for a cookie session', async () => {

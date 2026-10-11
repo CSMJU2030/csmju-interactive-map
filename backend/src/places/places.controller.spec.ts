@@ -9,7 +9,7 @@ describe("PlacesController", () => {
   const controller = new PlacesController(service);
 
   it("GET places returns a paginated envelope, never a raw array", async () => {
-    const response = await controller.findAll({ page: 1, limit: 20 }, 'verified-token');
+    const response = await controller.findAll({ page: 1, limit: 20 });
     expect(response).toEqual({
       data: [],
       meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
@@ -21,7 +21,7 @@ describe("PlacesController", () => {
       q: "lab",
       page: 2,
       limit: 5,
-    }, 'verified-token');
+    });
     expect(response.meta?.page).toBe(2);
     expect(response.meta?.limit).toBe(5);
   });

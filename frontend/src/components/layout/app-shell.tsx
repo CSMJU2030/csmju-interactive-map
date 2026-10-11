@@ -11,6 +11,7 @@ import {
 import { CurrentUserProvider, useCurrentUser } from "@/lib/current-user";
 import { loginHref } from "@/lib/sign-in";
 import { LoadingState } from "@/components/common/ui-feedback";
+import { isPublicPage } from "@/lib/public-pages";
 const nav: NavItem[] = [
   {
     href: "/map",
@@ -58,7 +59,7 @@ function ShellContent({ children, coreHubUrl }: AppShellProps) {
   useShellAccessibility(root);
   const pathname = usePathname();
   const { user, canManage, loading } = useCurrentUser();
-  const publicPage = pathname === "/about" || pathname === "/signin-again";
+  const publicPage = isPublicPage(pathname);
   return (
     <div
       ref={root}
@@ -73,25 +74,25 @@ function ShellContent({ children, coreHubUrl }: AppShellProps) {
       <CsmjuAppShell
         displayName="แผนที่ CSMJU"
         coreHubUrl={coreHubUrl}
-        nav={nav.filter(
-          (item) => canManage || !["/admin", "/personnel"].includes(item.href),
-        )}
+        nav={nav.filter((item) => canManage || item.href !== "/admin")}
         user={{
           initials: user?.email.slice(0, 2).toUpperCase() ?? "CS",
-          roleLabel: user ? roles[user.coreRole] : "ยังไม่ได้เข้าสู่ระบบ",
+          roleLabel: user
+              ? roles[user.coreRole]
+              : "ยังไม่ได้เข้าสู่ระบบ",
         }}
       >
-        {loading ? (
+        {loading && !publicPage ? (
           <LoadingState />
         ) : user || publicPage ? (
           children
         ) : (
           <section className={`${cardClass} mx-auto max-w-xl space-y-4 p-6`}>
             <h1 className="font-display text-headline-md">
-              แผนที่สาขาวิทยาการคอมพิวเตอร์
+              จัดการแผนที่สาขาวิทยาการคอมพิวเตอร์
             </h1>
             <p className="text-body-md">
-              เข้าสู่ระบบผ่าน Core Hub เพื่อดูแผนที่และข้อมูลห้อง
+              เข้าสู่ระบบผ่าน Core Hub เพื่อจัดการข้อมูล
             </p>
             <a
               href={loginHref(pathname)}

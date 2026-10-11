@@ -8,16 +8,38 @@ import {
   GroupIcon as UsersRound,
 } from "@/csmju";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   LoadingState,
   ErrorState,
   EmptyState,
   Pagination,
 } from "@/components/common/ui-feedback";
+import { isTeachingNow } from "@/lib/teaching-schedule";
 import { apiRequest } from "@/lib/api";
 import type { PersonnelDirectory } from "@/types/api";
 
 type PersonnelFilter = "ALL" | "TEACHER" | "STAFF";
+function PersonnelPortrait({ person }: { person: PersonnelDirectory }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <span className="grid h-40 w-40 shrink-0 place-items-center overflow-hidden rounded-2xl bg-surface text-on-surface-variant">
+      {person.imageProfile && !failed ? (
+        <Image
+          src={person.imageProfile}
+          alt={person.nameTh}
+          width={160}
+          height={160}
+          unoptimized
+          className="h-full w-full object-contain"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <UserRound width={28} height={28} aria-hidden="true" />
+      )}
+    </span>
+  );
+}
 
 const filters: Array<{ value: PersonnelFilter; label: string }> = [
   { value: "ALL", label: "ทั้งหมด" },
@@ -26,6 +48,15 @@ const filters: Array<{ value: PersonnelFilter; label: string }> = [
 ];
 
 export function PersonnelView() {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 15000);
+    const first = window.setTimeout(() => setNow(new Date()), 0);
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(first);
+    };
+  }, []);
   const [personnel, setPersonnel] = useState<PersonnelDirectory[]>([]);
   const [filter, setFilter] = useState<PersonnelFilter>("ALL");
   const [query, setQuery] = useState("");
@@ -44,7 +75,9 @@ export function PersonnelView() {
         const params = new URLSearchParams({ limit: "20", page: String(page) });
         if (query.trim()) params.set("q", query.trim());
         if (filter !== "ALL") params.set("personnelType", filter);
-        void apiRequest<PersonnelDirectory[]>("/api/v1/lecturers/directory?" + params.toString())
+        void apiRequest<PersonnelDirectory[]>(
+          "/api/v1/lecturers/directory?" + params.toString(),
+        )
           .then((response) => {
             if (active) {
               setPersonnel(response.data);
@@ -138,25 +171,22 @@ export function PersonnelView() {
       {loading && <LoadingState />}
 
       {!loading && !error && (
-        <div className="grid gap-5 md:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))] gap-5">
           {personnel.map((person) => (
-            <article key={person.personCode} className={`${cardClass} overflow-hidden`}>
-              <div className="flex gap-4 p-5">
-
-                  <span className="grid h-28 w-24 shrink-0 place-items-center rounded-xl bg-surface text-on-surface-variant">
-                    <UserRound width={20} height={20} aria-hidden="true" />
-                  </span>
+            <article
+              key={person.personCode}
+              className={`${cardClass} overflow-hidden`}
+            >
+              <div className="flex flex-col items-center gap-4 p-5 text-center">
+                <PersonnelPortrait person={person} />
 
                 <div className="min-w-0">
-                  <span
-                    className="inline-flex rounded-full bg-primary-container/10 px-2.5 py-1 text-caption font-semibold text-primary-container"
-                  >
+                  <span className="inline-flex rounded-full bg-primary-container/10 px-2.5 py-1 text-caption font-semibold text-primary-container">
                     {person.personnelType === "TEACHER"
                       ? "คณาจารย์"
                       : "เจ้าหน้าที่"}
                   </span>
                   <h2 className="mt-2 text-lg font-bold leading-snug text-on-surface">
-
                     {person.nameTh}
                   </h2>
                   {person.nameEn && (
@@ -172,8 +202,31 @@ export function PersonnelView() {
                 </div>
               </div>
               <div className="space-y-2 border-t border-outline-variant/40 px-5 py-4 text-label-md text-on-surface-variant">
-                {person.positionManager && <p>{person.positionManager}</p>}
-
+                {person.place && (
+                  <p>
+                    ห้องทำงาน: {person.place.roomCode || person.place.nameTh}
+                  </p>
+                )}
+                {now &&
+                  (person.teachingSchedule ?? [])
+                    .filter((slot) => isTeachingNow(slot, now))
+                    .map((slot) => (
+                      <p
+                        key={slot.id}
+                        className="font-medium text-primary-container"
+                      >
+                        กำลังสอน: {slot.place.roomCode || slot.place.nameTh} ·{" "}
+                        {slot.startTime}–{slot.endTime}
+                      </p>
+                    ))}
+                {person.positionManager &&
+                  person.positionManager !== person.positionAcademic && (
+                    <p>{person.positionManager}</p>
+                  )}
+                {person.phone && <p>โทรศัพท์: {person.phone}</p>}
+                {person.education && (
+                  <p className="leading-relaxed">{person.education}</p>
+                )}
                 {person.email && (
                   <a
                     className="flex items-center gap-2 hover:text-primary-container"
@@ -210,7 +263,16 @@ export function PersonnelView() {
         <Pagination page={page} totalPages={totalPages} onChange={setPage} />
       )}
       <p className="text-caption text-on-surface-variant">
-        ข้อมูลคณาจารย์และเจ้าหน้าที่จาก Core Hub
+        ข้อมูลบุคลากรจาก{" "}
+        <a
+          href="https://www.csmju.com/personnels"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary-container hover:underline"
+        >
+          เว็บสาขาวิชาวิทยาการคอมพิวเตอร์
+        </a>{" "}
+        และรายการที่ผู้ดูแลบันทึก · ห้องทำงานกำหนดในระบบแผนที่
       </p>
     </div>
   );

@@ -8,6 +8,8 @@ import {
   IsBoolean,
   IsEnum,
   IsNumber,
+  IsInt,
+  Matches,
   IsOptional,
   IsString,
   IsUUID,
@@ -19,17 +21,30 @@ import {
 } from "class-validator";
 import { PaginationQueryDto } from "../../common/dto/pagination-query.dto";
 
+export class TeachingSessionInputDto {
+  @ApiProperty({format:'uuid'}) @IsUUID() lecturerId!: string;
+  @ApiProperty({minimum:0,maximum:6}) @IsInt() @Min(0) @Max(6) dayOfWeek!: number;
+  @ApiProperty({example:'09:00'}) @Matches(/^([01]\d|2[0-3]):[0-5]\d$/) startTime!: string;
+  @ApiProperty({example:'12:00'}) @Matches(/^([01]\d|2[0-3]):[0-5]\d$/) endTime!: string;
+  @ApiProperty({example:'2026-06-01'}) @Matches(/^\d{4}-\d{2}-\d{2}$/) validFrom!: string;
+  @ApiProperty({example:'2026-10-31'}) @Matches(/^\d{4}-\d{2}-\d{2}$/) validUntil!: string;
+  @ApiProperty() @IsString() @Length(1,150) courseName!: string;
+}
+
 export class CreatePlaceDto {
+  @ApiPropertyOptional({type:[TeachingSessionInputDto]})
+  @IsOptional() @IsArray() @ArrayMaxSize(100) @ValidateNested({each:true}) @Type(() => TeachingSessionInputDto)
+  teachingSchedule?: TeachingSessionInputDto[];
   @ApiPropertyOptional({ example: "LAB-03" })
   @IsOptional()
   @IsString()
   @MaxLength(50)
   roomCode?: string;
 
-  @ApiPropertyOptional({ description: "ชื่อจุดบนแผนที่ที่ไม่ใช่ห้องของ Core Hub" })
+  @ApiPropertyOptional({ description: "ชื่อห้องหรือสถานที่ที่แก้ไขได้ในระบบ" })
   @IsOptional()
   @IsString()
-  @Length(1, 150)
+  @MaxLength(150)
   nameTh?: string;
 
   @ApiPropertyOptional()
