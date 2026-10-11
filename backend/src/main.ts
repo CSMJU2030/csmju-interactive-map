@@ -22,6 +22,10 @@ export const buildOpenApiDocument = (
     .addCookieAuth("csmju_interactive_map_access_token")
     .build();
   const document = SwaggerModule.createDocument(app, config, {extraModels:[CurrentUserDto, MapPointDto, ApiErrorEnvelopeDto]});
+  for (const path of ['/api/v1/places', '/api/v1/places/search', '/api/v1/places/layout-config', '/api/v1/places/{id}', '/api/v1/lecturers/directory']) {
+    const operation = document.paths[path]?.get;
+    if (operation) operation.security = [];
+  }
   const me = document.paths['/api/v1/me']?.get;
   if (me) {
     me.security = [{'core-hub-bearer':[]}];

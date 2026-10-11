@@ -8,6 +8,9 @@ coverage
 **/coverage
 .env
 **/.env*
+**/backend.env
+**/frontend.env
+*-production-env.zip
 *.log
 
 # Development evidence and standards are not runtime assets.

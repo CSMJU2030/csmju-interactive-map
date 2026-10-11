@@ -1,4 +1,10 @@
-import { ApiResult, LecturerResponseDto, DeletedRecordDto, CorePersonOptionDto, PersonnelDirectoryDto } from '../contracts/map-contract.dto';
+import {
+  ApiResult,
+  LecturerResponseDto,
+  DeletedRecordDto,
+  PersonnelDirectoryDto,
+  PersonnelImportResultDto,
+} from "../contracts/map-contract.dto";
 import {
   Body,
   Controller,
@@ -14,8 +20,9 @@ import {
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Permission } from "../auth/permissions";
-import { CoreHubAccessToken } from '../auth/decorators/core-hub-access-token.decorator';
+import { CoreHubAccessToken } from "../auth/decorators/core-hub-access-token.decorator";
 import { RequirePermissions } from "../auth/decorators/require-permissions.decorator";
+import { Public } from "../auth/decorators/public.decorator";
 import { paginated, success } from "../common/types/api-response";
 import {
   CreateLecturerDto,
@@ -36,7 +43,10 @@ export class LecturersController {
   @Header("Cache-Control", "no-store")
   @RequirePermissions(Permission.LECTURER_READ)
   @ApiOperation({ summary: "List lecturers with their assigned offices" })
-  async findAll(@Query() query: LecturerListQueryDto, @CoreHubAccessToken() token: string) {
+  async findAll(
+    @Query() query: LecturerListQueryDto,
+    @CoreHubAccessToken() token: string,
+  ) {
     const result = await this.lecturers.findAll(query, token);
     return paginated(result.data, query.page, query.limit, result.total);
   }
@@ -46,36 +56,45 @@ export class LecturersController {
   @Header("Cache-Control", "no-store")
   @RequirePermissions(Permission.LECTURER_READ)
   @ApiOperation({ summary: "Search lecturers by partial name or email" })
-  async search(@Query() query: SearchLecturerQueryDto, @CoreHubAccessToken() token: string) {
+  async search(
+    @Query() query: SearchLecturerQueryDto,
+    @CoreHubAccessToken() token: string,
+  ) {
     const result = await this.lecturers.findAll(query, token);
     return paginated(result.data, query.page, query.limit, result.total);
   }
 
-  @Get('core-people')
-  @ApiResult(CorePersonOptionDto, true)
-  @Header('Cache-Control','no-store')
-  @RequirePermissions(Permission.LECTURER_READ)
-  async corePeople(@Query() query: LecturerListQueryDto, @CoreHubAccessToken() token: string) {
-    const result = await this.lecturers.availablePeople(query,token);
-    return paginated(result.data,query.page,query.limit,result.total);
+  @Get("directory")
+  @Public()
+  @ApiResult(PersonnelDirectoryDto, true)
+  @Header("Cache-Control", "no-store")
+  @ApiOperation({ summary: "Read the locally managed personnel directory" })
+  async directory(@Query() query: LecturerListQueryDto) {
+    const result = await this.lecturers.directory(query);
+    return paginated(result.data, query.page, query.limit, result.total);
   }
 
-  @Get('directory')
-  @ApiResult(PersonnelDirectoryDto, true)
-  @Header('Cache-Control', 'no-store')
-  @RequirePermissions(Permission.LECTURER_READ)
-  @ApiOperation({ summary: 'Read the active department personnel directory from Core Hub' })
-  async directory(@Query() query: LecturerListQueryDto, @CoreHubAccessToken() token: string) {
-    const result = await this.lecturers.directory(query, token);
-    return paginated(result.data, query.page, query.limit, result.total);
+  @Post("import-csmju")
+  @ApiResult(PersonnelImportResultDto, false, 200)
+  @HttpCode(200)
+  @RequirePermissions(Permission.LECTURER_CREATE, Permission.LECTURER_UPDATE)
+  @ApiOperation({
+    summary:
+      "Import current public personnel from the CSMJU department website",
+  })
+  async importCsmju() {
+    return success(await this.lecturers.importCsmju());
   }
 
   @Post()
   @ApiResult(LecturerResponseDto, false, 201)
-  @Header('Cache-Control','no-store')
+  @Header("Cache-Control", "no-store")
   @ApiBearerAuth("core-hub-bearer")
   @RequirePermissions(Permission.LECTURER_CREATE)
-  async create(@Body() dto: CreateLecturerDto, @CoreHubAccessToken() token: string) {
+  async create(
+    @Body() dto: CreateLecturerDto,
+    @CoreHubAccessToken() token: string,
+  ) {
     return success(await this.lecturers.create(dto, token));
   }
 

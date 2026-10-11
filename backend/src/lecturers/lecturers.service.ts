@@ -1,126 +1,254 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Prisma } from '@prisma/client';
-import { AppException, ErrorCode } from '../common/errors';
-import { coreHubFailure, getFromCoreHub } from '../core-hub/core-hub-http';
-import { PrismaService } from '../prisma/prisma.service';
-import { PlaceReferenceService } from '../places/place-reference.service';
-import { CreateLecturerDto, LecturerListQueryDto, UpdateLecturerDto } from './dto/lecturer.dto';
-
-interface CorePerson {
-  personCode: string; personType: string; staffType: string | null;
-  coreUserId: string | null; fullNameTh: string; fullNameEn: string | null;
-  academicTitle: string | null; jobTitle: string | null; universityEmail?: string;
-}
-type Assignment = Prisma.LecturerGetPayload<{ include: {place: true} }>;
-
+import { Injectable } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
+import { AppException } from "../common/errors";
+import { PrismaService } from "../prisma/prisma.service";
+import {
+  normalizedPersonnelName,
+  parseCsmjuPersonnels,
+  personnelSourceUrl,
+  safePersonnelImage,
+} from "./csmju-personnels";
+import {
+  CreateLecturerDto,
+  LecturerListQueryDto,
+  UpdateLecturerDto,
+} from "./dto/lecturer.dto";
+type Assignment = Prisma.LecturerGetPayload<{
+  include: { place: true; teachingSchedule: { include: { place: true } } };
+}>;
 @Injectable()
 export class LecturersService {
-  constructor(private readonly prisma: PrismaService, private readonly config: ConfigService, private readonly rooms: PlaceReferenceService) {}
-
-  private async coreData(path: string, token: string): Promise<{data: unknown; meta?: Record<string, number>}> {
+  constructor(private readonly prisma: PrismaService) {}
+  async findAll(query: LecturerListQueryDto, _token?: string) {
+    void _token;
+    const q = query.q?.trim();
+    const where: Prisma.LecturerWhereInput = {
+      ...(query.personnelType ? { personnelType: query.personnelType } : {}),
+      ...(q
+        ? {
+            OR: ["nameTh", "nameEn", "personCode", "email"].map((field) => ({
+              [field]: { contains: q, mode: "insensitive" },
+            })),
+          }
+        : {}),
+    };
+    const [rows, total] = await this.prisma.$transaction([
+      this.prisma.lecturer.findMany({
+        where,
+        include: {
+          place: true,
+          teachingSchedule: { include: { place: true } },
+        },
+        orderBy: { nameTh: "asc" },
+        skip: (query.page - 1) * query.limit,
+        take: query.limit,
+      }),
+      this.prisma.lecturer.count({ where }),
+    ]);
+    return { data: rows.map((row) => this.present(row)), total };
+  }
+  async directory(query: LecturerListQueryDto, token?: string) {
+    return this.findAll(query, token);
+  }
+  async importCsmju() {
+    let people;
     try {
-      const url = this.config.get<string>('coreHub.url') as string;
-      const body = await getFromCoreHub(url + '/api/v1' + path, token, 5000) as {success?:boolean; data?:unknown; meta?:Record<string,number>};
-      if (body.success !== true) throw new Error('Invalid Core Hub response');
-      return {data:body.data, meta:body.meta};
-    } catch(error) { throw coreHubFailure(error); }
-  }
-
-  private async person(code: string, token: string): Promise<CorePerson> {
-    const body = await this.coreData('/people/' + encodeURIComponent(code), token);
-    const person = body.data as CorePerson;
-    if (!person || person.personCode !== code || typeof person.fullNameTh !== 'string') throw coreHubFailure(new Error('Invalid person response'));
-    if(person.personType !== 'STAFF') throw new AppException(ErrorCode.VALIDATION_ERROR, 'เลือกบุคลากรจาก Core Hub เท่านั้น', HttpStatus.BAD_REQUEST);
-    return person;
-  }
-
-  // Personal information is requested afresh on every call, never cached or persisted.
-  async availablePeople(query: LecturerListQueryDto, token: string) {
-    const params = new URLSearchParams({personType:'STAFF', page:String(query.page), limit:String(query.limit)});
-    if(query.q) params.set('q',query.q);
-    const body = await this.coreData('/people?' + params.toString(), token);
-    return {data:(body.data as CorePerson[]).map(person => ({personCode:person.personCode, nameTh:person.fullNameTh, personnelType:person.staffType === 'LECTURER' ? 'TEACHER' : 'STAFF'})), total:body.meta?.total ?? 0};
-  }
-
-  async findAll(query: LecturerListQueryDto, token: string) {
-    const assignments = await this.prisma.lecturer.findMany({include:{place:true},orderBy:{personCode:'asc'}});
-    const data = [];
-    for(const assignment of assignments) data.push(await this.present(assignment, token));
-    const q = (query.q ?? '').trim().toLowerCase();
-    const filtered = data.filter(row => (!query.personnelType || row.personnelType === query.personnelType) && (!q || [row.nameTh,row.nameEn,row.personCode].some(value=>value?.toLowerCase().includes(q))));
-    return {data:filtered.slice((query.page-1)*query.limit,query.page*query.limit),total:filtered.length};
-  }
-
-  // The directory includes people without local office assignments. Never cache or save it.
-  async directory(query: LecturerListQueryDto, token: string) {
-    const params = new URLSearchParams({
-      personType: 'STAFF', status: 'ACTIVE', limit: '100', page: '1',
-      departmentCode: this.config.get<string>('personnelDepartmentCode', 'CS'),
-    });
-    if (query.q?.trim()) params.set('q', query.q.trim());
-    const people: CorePerson[] = [];
-    let totalPages = 1;
-    for (let page = 1; page <= totalPages; page++) {
-      params.set('page', String(page));
-      const body = await this.coreData('/people?' + params.toString(), token);
-      if (!Array.isArray(body.data) || !body.data.every((person: CorePerson) =>
-        person && typeof person.personCode === 'string' && typeof person.fullNameTh === 'string' && person.personType === 'STAFF',
-      )) throw coreHubFailure(new Error('Invalid Core Hub personnel directory'));
-      const pages = body.meta?.totalPages;
-      if (typeof pages !== 'number' || !Number.isInteger(pages) || pages < 0) {
-        throw coreHubFailure(new Error('Invalid Core Hub personnel pagination'));
-      }
-      if (page === 1) totalPages = pages;
-      people.push(...body.data as CorePerson[]);
+      const response = await fetch(personnelSourceUrl, {
+        signal: AbortSignal.timeout(20000),
+        redirect: "error",
+      });
+      if (!response.ok) throw new Error("Source unavailable");
+      const html = await response.text();
+      if (html.length > 5_000_000) throw new Error("Source too large");
+      people = parseCsmjuPersonnels(html);
+    } catch {
+      throw AppException.serviceUnavailable(
+        "ดึงข้อมูลบุคลากรจากเว็บสาขาไม่สำเร็จ กรุณาลองใหม่ภายหลัง",
+        30,
+      );
     }
-    const data = people.map(person => ({
-      personCode: person.personCode,
-      nameTh: person.fullNameTh,
-      nameEn: person.fullNameEn ?? null,
-      personnelType: person.staffType === 'LECTURER' ? 'TEACHER' as const : 'STAFF' as const,
-      positionAcademic: person.academicTitle ?? null,
-      positionManager: person.jobTitle ?? null,
-      email: person.universityEmail ?? null,
-    })).filter(person => !query.personnelType || person.personnelType === query.personnelType)
-      .sort((left, right) => left.nameTh.localeCompare(right.nameTh, 'th'));
-    return { data: data.slice((query.page - 1) * query.limit, query.page * query.limit), total: data.length };
+    return this.prisma.$transaction(
+      async (tx) => {
+        const existing = await tx.lecturer.findMany({
+          include: { _count: { select: { teachingSchedule: true } } },
+        });
+        let created = 0;
+        let updated = 0;
+        const skipped: string[] = [];
+        const claimed = new Set<string>();
+        for (const person of people) {
+          const linked = existing.filter(
+            (row) => row.sourcePersonnelId === person.id,
+          );
+          const matches = linked.length
+            ? linked
+            : existing.filter(
+                (row) =>
+                  !row.sourcePersonnelId &&
+                  (normalizedPersonnelName(row.nameTh) ===
+                    normalizedPersonnelName(person.fullnameTh) ||
+                    Boolean(
+                      person.email &&
+                      row.email?.toLowerCase() === person.email.toLowerCase(),
+                    )),
+              );
+          const match = matches[0];
+          if (
+            matches.length > 1 ||
+            (match && claimed.has(match.id)) ||
+            (match &&
+              person.personnelType === "เจ้าหน้าที่" &&
+              match._count.teachingSchedule > 0)
+          ) {
+            skipped.push(person.fullnameTh);
+            continue;
+          }
+          const data = {
+            sourcePersonnelId: person.id,
+            nameTh: (
+              (person.prefix?.trim() ?? "") +
+              " " +
+              person.fullnameTh
+            ).trim(),
+            nameEn: person.fullnameEn || null,
+            personnelType:
+              person.personnelType === "อาจารย์"
+                ? ("TEACHER" as const)
+                : ("STAFF" as const),
+            email: person.email || null,
+            positionAcademic: person.academicPosition || null,
+            positionManager: person.administrativePosition || null,
+            imageProfile: safePersonnelImage(person.profileImage?.url),
+            phone: person.phoneNumber || null,
+            education: person.education || null,
+          };
+          if (match) {
+            await tx.lecturer.update({ where: { id: match.id }, data });
+            claimed.add(match.id);
+            updated++;
+          } else {
+            await tx.lecturer.create({
+              data: { ...data, personCode: "CSMJU-" + person.id },
+            });
+            created++;
+          }
+        }
+        return { created, updated, skipped, sourceUrl: personnelSourceUrl };
+      },
+      { timeout: 20000 },
+    );
   }
-
-  async create(dto: CreateLecturerDto, token: string) {
-    const person = await this.person(dto.personCode, token);
-    if(dto.placeId) await this.ensurePlace(dto.placeId, token);
-    const row = await this.prisma.lecturer.create({data:{personCode:person.personCode,coreUserId:person.coreUserId,placeId:dto.placeId ?? null},include:{place:true}});
-    return this.present(row,token,person);
+  async create(dto: CreateLecturerDto, _token?: string) {
+    void _token;
+    this.validate(dto);
+    if (dto.placeId) await this.ensurePlace(dto.placeId);
+    const row = await this.prisma.lecturer.create({
+      data: {
+        ...dto,
+        personCode: dto.personCode.trim(),
+        nameTh: dto.nameTh.trim(),
+        placeId: dto.placeId || null,
+      },
+      include: { place: true, teachingSchedule: { include: { place: true } } },
+    });
+    return this.present(row);
   }
-
-  async update(id: string, dto: UpdateLecturerDto, token: string) {
+  async update(id: string, dto: UpdateLecturerDto, _token?: string) {
+    void _token;
     await this.ensureAssignment(id);
-    const person = dto.personCode ? await this.person(dto.personCode,token) : undefined;
-    if(dto.placeId) await this.ensurePlace(dto.placeId, token);
-    const row = await this.prisma.lecturer.update({where:{id},data:{
-      ...(person ? {personCode:person.personCode,coreUserId:person.coreUserId}:{}),
-      ...(dto.placeId !== undefined ? {placeId:dto.placeId || null}:{}),
-    },include:{place:true}});
-    return this.present(row,token,person);
+    this.validate(dto);
+    if (
+      dto.personnelType === "STAFF" &&
+      (await this.prisma.teachingSession.count({ where: { lecturerId: id } }))
+    )
+      throw AppException.badRequest(
+        "กรุณาลบตารางสอนของบุคลากรก่อนเปลี่ยนเป็นเจ้าหน้าที่",
+      );
+    if (dto.placeId) await this.ensurePlace(dto.placeId);
+    const row = await this.prisma.lecturer.update({
+      where: { id },
+      data: {
+        ...dto,
+        ...(dto.personCode !== undefined
+          ? { personCode: dto.personCode.trim() }
+          : {}),
+        ...(dto.nameTh !== undefined ? { nameTh: dto.nameTh.trim() } : {}),
+        ...(dto.placeId !== undefined ? { placeId: dto.placeId || null } : {}),
+      },
+      include: { place: true, teachingSchedule: { include: { place: true } } },
+    });
+    return this.present(row);
   }
-
-  async remove(id:string) { await this.ensureAssignment(id); await this.prisma.lecturer.delete({where:{id}}); return {id,deleted:true}; }
-  private async ensurePlace(id:string, token:string) {
-    const place = await this.prisma.place.findUnique({where:{id}});
-    if(!place) throw AppException.notFound('ไม่พบจุดบนแผนที่');
-    if(!place.roomCode || !place.isActive) throw new AppException(ErrorCode.VALIDATION_ERROR, 'เลือกห้องที่เปิดใช้งานจาก Core Hub เท่านั้น', HttpStatus.BAD_REQUEST);
-    await this.rooms.validate(place.roomCode, null, token);
+  async remove(id: string) {
+    await this.ensureAssignment(id);
+    await this.prisma.lecturer.delete({ where: { id } });
+    return { id, deleted: true };
   }
-  private async ensureAssignment(id:string) { if(!await this.prisma.lecturer.count({where:{id}})) throw AppException.notFound('ไม่พบการกำหนดห้องบุคลากร'); }
-
-  private async present(row:Assignment, token:string, person?:CorePerson) {
-    const details = person ?? await this.person(row.personCode,token);
-    const room = row.place?.roomCode ? await this.rooms.room(row.place.roomCode,token) : null;
-    return {id:row.id,personCode:row.personCode,sourceId:null,title:null,nameTh:details.fullNameTh,nameEn:details.fullNameEn,
-      personnelType:details.staffType === 'LECTURER' ? 'TEACHER' : 'STAFF',positionAcademic:details.academicTitle,positionManager:details.jobTitle,
-      imageProfile:null,email:details.universityEmail ?? null,phone:null,education:null,academicType:null,
-      placeId:row.placeId,place:row.place ? {id:row.place.id,roomCode:row.place.roomCode,nameTh:room?.nameTh ?? row.place.landmarkLabel ?? row.place.roomCode ?? '',nameEn:null,category:row.place.category,positionX:Number(row.place.positionX),positionY:Number(row.place.positionY),isActive:row.place.isActive}:null,
-      createdAt:row.createdAt.toISOString(),updatedAt:row.updatedAt.toISOString()};
+  private validate(dto: UpdateLecturerDto) {
+    if (dto.nameTh !== undefined && !dto.nameTh?.trim())
+      throw AppException.badRequest("กรุณากรอกชื่อบุคลากร");
+    if (dto.personCode !== undefined && !dto.personCode?.trim())
+      throw AppException.badRequest("กรุณากรอกรหัสบุคลากร");
+  }
+  private async ensurePlace(id: string) {
+    const place = await this.prisma.place.findUnique({ where: { id } });
+    if (!place || !place.isActive)
+      throw AppException.badRequest("กรุณาเลือกสถานที่ที่เปิดใช้งานบนแผนที่");
+  }
+  private async ensureAssignment(id: string) {
+    if (!(await this.prisma.lecturer.count({ where: { id } })))
+      throw AppException.notFound("ไม่พบบุคลากร");
+  }
+  private present(row: Assignment) {
+    return {
+      id: row.id,
+      personCode: row.personCode,
+      nameTh: row.nameTh,
+      nameEn: row.nameEn,
+      email: row.email,
+      personnelType: row.personnelType,
+      positionAcademic: row.positionAcademic,
+      positionManager: row.positionManager,
+      placeId: row.placeId,
+      teachingSchedule: (row.teachingSchedule ?? [])
+        .filter((session) => session.place.isActive)
+        .map((session) => ({
+          ...session,
+          lecturerName: row.nameTh,
+          place: {
+            id: session.place.id,
+            roomCode: session.place.roomCode,
+            nameTh: session.place.landmarkLabel ?? session.place.roomCode ?? "",
+            nameEn: null,
+            category: session.place.category,
+            positionX: Number(session.place.positionX),
+            positionY: Number(session.place.positionY),
+            isActive: session.place.isActive,
+          },
+        })),
+      sourceId: null,
+      title: null,
+      imageProfile: row.imageProfile,
+      sourceUrl: row.sourcePersonnelId
+        ? personnelSourceUrl + "/" + row.sourcePersonnelId
+        : null,
+      phone: row.phone,
+      education: row.education,
+      academicType: null,
+      place: row.place
+        ? {
+            id: row.place.id,
+            roomCode: row.place.roomCode,
+            nameTh: row.place.landmarkLabel ?? row.place.roomCode ?? "",
+            nameEn: null,
+            category: row.place.category,
+            positionX: Number(row.place.positionX),
+            positionY: Number(row.place.positionY),
+            isActive: row.place.isActive,
+          }
+        : null,
+      createdAt: row.createdAt.toISOString(),
+      updatedAt: row.updatedAt.toISOString(),
+    };
   }
 }

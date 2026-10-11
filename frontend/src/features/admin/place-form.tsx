@@ -2,7 +2,7 @@
 
 import { inputClass, primaryButtonClass, secondaryButtonClass } from "@/csmju";
 import { MoreHorizIcon as LoaderCircle, CloseIcon as X } from "@/csmju";
-import { cloneElement, useEffect, useId, useState } from "react";
+import { cloneElement, useEffect, useId, useRef, useState } from "react";
 import { z } from "zod";
 import { apiRequest, fieldError } from "@/lib/api";
 import { categoryLabels } from "@/lib/categories";
@@ -15,7 +15,7 @@ const categoryValues = Object.keys(categoryLabels) as [
 ];
 const placeSchema = z.object({
   nameTh: z.string().trim().max(150, "กรอกได้ไม่เกิน 150 ตัวอักษร"),
-  roomCode: z.string().trim().max(30, "กรอกได้ไม่เกิน 30 ตัวอักษร"),
+  roomCode: z.string().trim().max(50, "กรอกได้ไม่เกิน 50 ตัวอักษร"),
   category: z.enum(categoryValues),
   description: z.string().trim().max(1000, "กรอกได้ไม่เกิน 1,000 ตัวอักษร"),
   positionX: z
@@ -69,44 +69,23 @@ export function PlaceForm({
 }) {
   const [values, setValues] = useState<PlaceFormValues>(defaults);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [rooms, setRooms] = useState<Array<{ code: string; nameTh: string }>>(
-    [],
-  );
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      const available: Array<{ code: string; nameTh: string }> = [];
-      let page = 1;
-      let totalPages = 1;
-      do {
-        const response = await apiRequest<
-          Array<{ code: string; nameTh: string }>
-        >(`/api/v1/places/core-rooms?limit=100&page=${page}`);
-        available.push(...response.data);
-        totalPages = response.meta?.totalPages ?? 1;
-        page += 1;
-      } while (page <= totalPages && active);
-      if (active) setRooms(available);
-    };
-    void load().catch((error: unknown) => {
-      if (active)
-        setErrors({
-          root: error instanceof Error ? error.message : "โหลดห้องไม่สำเร็จ",
-        });
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
   const [submitting, setSubmitting] = useState(false);
+  const formRegion = useRef<HTMLDivElement>(null);
 
-  const [sourcePlace, setSourcePlace] = useState<Place | null | undefined>(undefined);
+  useEffect(() => {
+    formRegion.current?.scrollIntoView({ block: "start" });
+    formRegion.current?.focus({ preventScroll: true });
+  }, [place]);
+
+  const [sourcePlace, setSourcePlace] = useState<Place | null | undefined>(
+    undefined,
+  );
   if (sourcePlace !== place) {
     setSourcePlace(place);
     setValues(
       place
         ? {
-            nameTh: place.roomCode ? "" : place.nameTh,
+            nameTh: place.nameTh,
             roomCode: place.roomCode ?? "",
             category: place.category,
             description: place.description ?? "",
@@ -165,9 +144,9 @@ export function PlaceForm({
 
     const payload = {
       ...parsed.data,
-      roomCode: parsed.data.roomCode || undefined,
-      nameTh: parsed.data.roomCode ? undefined : parsed.data.nameTh,
-      description: parsed.data.description || undefined,
+      roomCode: parsed.data.roomCode,
+      nameTh: parsed.data.nameTh,
+      description: parsed.data.description,
       keywords: parsed.data.keywordsText
         .split(",")
         .map((item) => item.trim())
@@ -203,7 +182,13 @@ export function PlaceForm({
   };
 
   return (
-    <div className="space-y-4 p-4" role="region" aria-label="ฟอร์มสถานที่">
+    <div
+      ref={formRegion}
+      tabIndex={-1}
+      className="scroll-mt-24 space-y-4 p-4 outline-none"
+      role="region"
+      aria-label="ฟอร์มสถานที่"
+    >
       <div className="mx-auto my-4 max-w-3xl rounded-xl bg-white shadow-xl md:my-10">
         <div className="flex items-center justify-between border-b border-outline-variant/40 px-5 py-4">
           <div>
@@ -237,32 +222,23 @@ export function PlaceForm({
               : null}
           </p>
           <div className="grid gap-4 md:grid-cols-2">
-            {!values.roomCode && (
-              <Field label="ชื่อจุดบนแผนที่" error={errors.nameTh} required>
-                <input
-                  className={`${inputClass} w-full`}
-                  onBlur={() => validateField("nameTh")}
-                  value={values.nameTh}
-                  onChange={(event) => set("nameTh", event.target.value)}
-                />
-              </Field>
-            )}
-            <Field label="ห้องจาก Core Hub" error={errors.roomCode}>
-              <select
+            <Field label="ชื่อห้อง / สถานที่" error={errors.nameTh} required>
+              <input
                 className={`${inputClass} w-full`}
+                onBlur={() => validateField("nameTh")}
+                value={values.nameTh}
+                onChange={(event) => set("nameTh", event.target.value)}
+              />
+            </Field>
+
+            <Field label="รหัสห้อง" error={errors.roomCode}>
+              <input
+                className={inputClass + " w-full"}
                 value={values.roomCode}
-                onChange={(event) => {
-                  set("roomCode", event.target.value);
-                  set("nameTh", "");
-                }}
-              >
-                <option value="">จุดบนแผนที่ที่ไม่ใช่ห้อง</option>
-                {rooms.map((room) => (
-                  <option key={room.code} value={room.code}>
-                    {room.code} — {room.nameTh}
-                  </option>
-                ))}
-              </select>
+                onChange={(event) => set("roomCode", event.target.value)}
+                onBlur={() => validateField("roomCode")}
+                placeholder="เช่น LECT-6"
+              />
             </Field>
             <Field label="ประเภท" error={errors.category} required>
               <select

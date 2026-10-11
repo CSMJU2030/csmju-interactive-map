@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { normalizeSearchQuery } from "../common/utils/search";
-import { PlaceReferenceService } from './place-reference.service';
+import { PlaceReferenceService } from "./place-reference.service";
 import { PrismaService } from "../prisma/prisma.service";
 import type {
   CreatePlaceDto,
@@ -13,8 +13,14 @@ import type {
   SearchPlaceQueryDto,
   UpdatePlacesLayoutDto,
   UpdatePlaceDto,
+  TeachingSessionInputDto,
 } from "./dto/place.dto";
 import { mapPlace, placeInclude, type PlaceResponse } from "./place.mapper";
+import { AppException } from "../common/errors";
+import {
+  parseRegistrarTimetable,
+  RegistrarQueryDto,
+} from "./registrar-timetable";
 
 const DEFAULT_CORRIDOR_POINTS = [
   { x: 25, y: 7 },
@@ -37,52 +43,89 @@ export interface BulkLayoutResponse {
 
 @Injectable()
 export class PlacesService {
-  constructor(private readonly prisma: PrismaService, private readonly references: PlaceReferenceService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly references: PlaceReferenceService,
+  ) {}
+
+  async registrarTimetable(query: RegistrarQueryDto) {
+    const url = new URL("https://reg.mju.ac.th/registrar/class_info_1.asp");
+    url.search = new URLSearchParams({
+      cmd: "2",
+      coursestatus: "O00",
+      facultyid: "all",
+      maxrow: "250",
+      acadyear: String(query.academicYear),
+      semester: String(query.semester),
+      CAMPUSID: "50",
+      LEVELID: "",
+      coursecode: "10301*",
+      coursename: "",
+    }).toString();
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
+      if (!response.ok) throw new Error("Registrar response failed");
+      const html = new TextDecoder("windows-874").decode(
+        await response.arrayBuffer(),
+      );
+      if (!html.includes("class_info") || !html.includes("รหัสวิชา"))
+        throw new Error("Unexpected registrar page");
+      return parseRegistrarTimetable(html);
+    } catch {
+      throw AppException.serviceUnavailable(
+        "ดึงตารางจากทะเบียนไม่สำเร็จ กรุณาลองใหม่หรือกรอกตารางสอนเอง",
+        30,
+      );
+    }
+  }
 
   async findAll(
     query: PlaceListQueryDto,
-    token: string,
+    token = "",
     includeInactive = false,
   ): Promise<{ data: PlaceResponse[]; total: number }> {
-    const q = query.q ? normalizeSearchQuery(query.q) : '';
-    const matchingCodes = q ? (await this.references.rooms(token)).filter(room => room.nameTh.toLowerCase().includes(q.toLowerCase())).map(room => room.code) : [];
-    const where = this.buildWhere(query.q, query.category, includeInactive, matchingCodes);
+    const where = this.buildWhere(query.q, query.category, includeInactive);
     const [places, total] = await this.prisma.$transaction([
       this.prisma.place.findMany({
         where,
         include: placeInclude,
-        orderBy: [{ category: "asc" }, { roomCode: "asc" }, { landmarkLabel: "asc" }],
+        orderBy: [
+          { category: "asc" },
+          { roomCode: "asc" },
+          { landmarkLabel: "asc" },
+        ],
         skip: (query.page - 1) * query.limit,
         take: query.limit,
       }),
       this.prisma.place.count({ where }),
     ]);
-    return { data: await this.mapPlaces(places, token), total };
+    return { data: this.mapPlaces(places, token), total };
   }
 
   async search(
     query: SearchPlaceQueryDto,
-    token: string,
+    token = "",
   ): Promise<{ data: PlaceResponse[]; total: number }> {
     return this.findAll({ ...query, q: query.q }, token);
   }
 
-  async findOne(id: string, token: string): Promise<PlaceResponse> {
+  async findOne(id: string, token = ""): Promise<PlaceResponse> {
     const place = await this.prisma.place.findFirst({
       where: { id, isActive: true },
       include: placeInclude,
     });
     if (!place) throw new NotFoundException("ไม่พบสถานที่");
-    return (await this.mapPlaces([place], token))[0];
+    return this.mapPlaces([place], token)[0];
   }
 
   async create(dto: CreatePlaceDto, token: string): Promise<PlaceResponse> {
-    await this.references.validate(dto.roomCode, dto.nameTh, token);
+    this.references.validate(dto.roomCode, dto.nameTh, token);
+    await this.validateSchedule(dto.teachingSchedule ?? []);
     const keywords = this.normalizeKeywords(dto.keywords);
     const place = await this.prisma.place.create({
       data: {
         roomCode: dto.roomCode?.trim() || null,
-        landmarkLabel: dto.roomCode ? null : dto.nameTh?.trim() || null,
+        landmarkLabel: dto.nameTh?.trim() || null,
         description: dto.description?.trim() || null,
         category: dto.category,
         positionX: dto.positionX,
@@ -90,25 +133,40 @@ export class PlacesService {
         width: dto.width ?? 12,
         height: dto.height ?? 8,
         isActive: dto.isActive ?? true,
+        teachingSchedule: { create: dto.teachingSchedule ?? [] },
         keywords: { create: keywords.map((keyword) => ({ keyword })) },
       },
       include: placeInclude,
     });
-    return (await this.mapPlaces([place], token))[0];
+    return this.mapPlaces([place], token)[0];
   }
 
-  async update(id: string, dto: UpdatePlaceDto, token: string): Promise<PlaceResponse> {
+  async update(
+    id: string,
+    dto: UpdatePlaceDto,
+    token: string,
+  ): Promise<PlaceResponse> {
     await this.ensureExists(id);
-    const current = await this.prisma.place.findUniqueOrThrow({where:{id}});
-    const roomCode = dto.roomCode !== undefined ? dto.roomCode.trim() || null : current.roomCode;
-    const label = dto.nameTh !== undefined ? dto.nameTh : roomCode ? null : current.landmarkLabel;
-    await this.references.validate(roomCode, label, token);
+    const current = await this.prisma.place.findUniqueOrThrow({
+      where: { id },
+    });
+    const roomCode =
+      dto.roomCode !== undefined
+        ? dto.roomCode?.trim() || null
+        : current.roomCode;
+    const label = dto.nameTh !== undefined ? dto.nameTh : current.landmarkLabel;
+    this.references.validate(roomCode, label, token);
+    if (dto.teachingSchedule !== undefined)
+      await this.validateSchedule(dto.teachingSchedule, id);
     const { keywords, ...values } = dto;
     const data: Prisma.PlaceUpdateInput = {
-      ...(values.roomCode !== undefined
-        ? { roomCode: values.roomCode.trim() || null }
+      ...(dto.teachingSchedule !== undefined
+        ? { teachingSchedule: { deleteMany: {}, create: dto.teachingSchedule } }
         : {}),
-      landmarkLabel: roomCode ? null : label?.trim() || null,
+      ...(values.roomCode !== undefined
+        ? { roomCode: values.roomCode?.trim() || null }
+        : {}),
+      landmarkLabel: label?.trim() || null,
       ...(values.description !== undefined
         ? { description: values.description.trim() || null }
         : {}),
@@ -138,7 +196,7 @@ export class PlacesService {
       data,
       include: placeInclude,
     });
-    return (await this.mapPlaces([place], token))[0];
+    return this.mapPlaces([place], token)[0];
   }
 
   async getMapLayout(): Promise<MapLayoutResponse> {
@@ -148,7 +206,10 @@ export class PlacesService {
     return this.mapLayout(layout);
   }
 
-  async updateLayout(dto: UpdatePlacesLayoutDto, token: string): Promise<BulkLayoutResponse> {
+  async updateLayout(
+    dto: UpdatePlacesLayoutDto,
+    token: string,
+  ): Promise<BulkLayoutResponse> {
     const items = dto.items ?? [];
     if (!items.length && !dto.corridor) {
       throw new BadRequestException(
@@ -205,7 +266,7 @@ export class PlacesService {
         : await transaction.mapLayout.findUnique({ where: { id: "main" } });
 
       return {
-        places: await this.mapPlaces(places, token),
+        places: this.mapPlaces(places, token),
         mapLayout: this.mapLayout(layout),
       };
     });
@@ -245,7 +306,6 @@ export class PlacesService {
     rawQuery?: string,
     category?: Prisma.EnumPlaceCategoryFilter["equals"],
     includeInactive = false,
-    matchingCodes: string[] = [],
   ): Prisma.PlaceWhereInput {
     const q = rawQuery ? normalizeSearchQuery(rawQuery) : "";
     return {
@@ -255,7 +315,18 @@ export class PlacesService {
         ? {
             OR: [
               { landmarkLabel: { contains: q, mode: "insensitive" } },
-              { roomCode: { in: matchingCodes } },
+              {
+                lecturers: {
+                  some: { nameTh: { contains: q, mode: "insensitive" } },
+                },
+              },
+              {
+                teachingSchedule: {
+                  some: {
+                    lecturer: { nameTh: { contains: q, mode: "insensitive" } },
+                  },
+                },
+              },
               { roomCode: { contains: q, mode: "insensitive" } },
               {
                 keywords: {
@@ -268,11 +339,100 @@ export class PlacesService {
     };
   }
 
-  private async mapPlaces(places: Parameters<typeof mapPlace>[0][], token: string): Promise<PlaceResponse[]> {
-    return Promise.all(places.map(async place => mapPlace(place, place.roomCode ? await this.references.room(place.roomCode, token) : null)));
+  private mapPlaces(
+    places: Parameters<typeof mapPlace>[0][],
+    _token: string,
+  ): PlaceResponse[] {
+    void _token;
+    return places.map((place) => mapPlace(place));
   }
 
-  async availableRooms(token: string) { return this.references.rooms(token); }
+  private async validateSchedule(
+    sessions: TeachingSessionInputDto[],
+    placeId?: string,
+  ): Promise<void> {
+    if (!Array.isArray(sessions))
+      throw new BadRequestException("รูปแบบตารางสอนไม่ถูกต้อง");
+    const validDate = (value: string) => {
+      const date = new Date(value + "T00:00:00Z");
+      return (
+        Number.isFinite(date.getTime()) &&
+        date.toISOString().slice(0, 10) === value
+      );
+    };
+    const overlaps = (
+      a: TeachingSessionInputDto,
+      b: TeachingSessionInputDto,
+    ) => {
+      if (
+        a.dayOfWeek !== b.dayOfWeek ||
+        a.startTime >= b.endTime ||
+        b.startTime >= a.endTime
+      )
+        return false;
+      const from = a.validFrom > b.validFrom ? a.validFrom : b.validFrom;
+      const until = a.validUntil < b.validUntil ? a.validUntil : b.validUntil;
+      if (from > until) return false;
+      const first = new Date(from + "T00:00:00Z");
+      first.setUTCDate(
+        first.getUTCDate() + ((a.dayOfWeek - first.getUTCDay() + 7) % 7),
+      );
+      return first.toISOString().slice(0, 10) <= until;
+    };
+    for (const [index, session] of sessions.entries()) {
+      if (
+        !session.courseName.trim() ||
+        session.startTime >= session.endTime ||
+        !validDate(session.validFrom) ||
+        !validDate(session.validUntil) ||
+        session.validFrom > session.validUntil
+      ) {
+        throw new BadRequestException(
+          "กรุณาตรวจชื่อวิชา เวลาเริ่ม–สิ้นสุด และช่วงวันที่ของตารางสอน",
+        );
+      }
+      if (
+        sessions
+          .slice(0, index)
+          .some(
+            (other) =>
+              overlaps(session, other) &&
+              !(
+                session.lecturerId !== other.lecturerId &&
+                session.courseName === other.courseName &&
+                session.startTime === other.startTime &&
+                session.endTime === other.endTime &&
+                session.validFrom === other.validFrom &&
+                session.validUntil === other.validUntil
+              ),
+          )
+      )
+        throw new BadRequestException("ช่วงเวลาสอนในห้องเดียวกันซ้อนกัน");
+    }
+    if (!sessions.length) return;
+    const ids = [...new Set(sessions.map((session) => session.lecturerId))];
+    if (
+      (await this.prisma.lecturer.count({
+        where: { id: { in: ids }, personnelType: "TEACHER" },
+      })) !== ids.length
+    )
+      throw new BadRequestException("กรุณาเลือกอาจารย์ที่มีข้อมูลในระบบ");
+    const others = await this.prisma.teachingSession.findMany({
+      where: {
+        lecturerId: { in: ids },
+        ...(placeId ? { placeId: { not: placeId } } : {}),
+      },
+    });
+    if (
+      sessions.some((session) =>
+        others.some(
+          (other) =>
+            session.lecturerId === other.lecturerId && overlaps(session, other),
+        ),
+      )
+    )
+      throw new BadRequestException("อาจารย์มีตารางสอนซ้อนกับห้องอื่น");
+  }
 
   private normalizeKeywords(keywords: string[] | undefined): string[] {
     return [
